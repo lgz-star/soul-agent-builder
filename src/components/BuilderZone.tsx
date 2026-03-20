@@ -27,7 +27,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { IconTrash, IconGripVertical } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import { SortableItem } from './SortableItem';
 import { EmptyState } from './EmptyState';
@@ -167,15 +167,15 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               <SortableContext items={soul.flows.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                 <Stack gap="xs">
                   {soul.flows.map((flow) => (
-                    <SortableItem key={flow.id} id={flow.id}>
-                      <Group wrap="nowrap">
-                        <ActionIcon variant="transparent" color="gray">
-                          <IconGripVertical size={18} />
-                        </ActionIcon>
-                        <Text size="sm" flex={1}>
-                          {flow.id}
-                        </Text>
-                      </Group>
+                    <SortableItem
+                      key={flow.id}
+                      id={flow.id}
+                      onRemove={() => {
+                        const newFlows = soul.flows.filter((f) => f.id !== flow.id);
+                        setFlows(newFlows);
+                      }}
+                    >
+                      <Text size="sm">{flow.id}</Text>
                     </SortableItem>
                   ))}
                 </Stack>

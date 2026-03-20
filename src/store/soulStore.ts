@@ -124,6 +124,37 @@ export const useSoulStore = create<SoulStore>()(
         get().saveToStorage();
       },
 
+      toggleFlow: (flowId: string) => {
+        set((state) => {
+          if (!state.soul) return { soul: { ...createEmptySoul(), flows: [{ id: flowId, order: 0 }] } };
+          const exists = state.soul.flows.find((f) => f.id === flowId);
+          let newFlows;
+          if (exists) {
+            // 移除
+            newFlows = state.soul.flows.filter((f) => f.id !== flowId);
+          } else {
+            // 添加
+            const maxOrder = state.soul.flows.reduce((max, f) => Math.max(max, f.order), -1);
+            newFlows = [...state.soul.flows, { id: flowId, order: maxOrder + 1 }];
+          }
+
+          const newSoul = {
+            ...state.soul,
+            flows: newFlows,
+            updatedAt: new Date().toISOString(),
+          };
+
+          // 验证 Soul 完整性
+          const validation = validateSoul(newSoul);
+          if (!validation.isValid) {
+            console.warn('Soul 验证失败:', validation.errors);
+          }
+
+          return { soul: newSoul };
+        });
+        get().saveToStorage();
+      },
+
       reorderFlows: (fromIndex: number, toIndex: number) => {
         const flows = get().soul?.flows || [];
         if (flows.length === 0) return;

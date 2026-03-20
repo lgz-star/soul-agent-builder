@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
   Box,
   Title,
@@ -9,8 +9,10 @@ import {
   Badge,
   Checkbox,
   ThemeIcon,
+  Collapse,
+  ActionIcon,
 } from '@mantine/core';
-import { IconPlus, IconCheck } from '@tabler/icons-react';
+import { IconPlus, IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import type { LibraryItem, LayerType, Soul, FlowStep } from '../store/soulStore.types';
 
@@ -18,6 +20,8 @@ interface ModuleLibraryProps {
   layerType: 'identity' | 'ability' | 'style' | 'flow' | 'constraint' | 'tool';
   title: string;
   inputType: 'single' | 'multi' | 'sort';
+  isExpanded: boolean;
+  onToggle: () => void;
 }
 
 // 配置驱动方式：层类型到 store 数据的映射
@@ -132,6 +136,8 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
   layerType,
   title,
   inputType,
+  isExpanded,
+  onToggle,
 }: ModuleLibraryProps) {
   const { libraries, soul } = useSoulStore();
 
@@ -158,6 +164,9 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
         case 'style':
           useSoulStore.getState().toggleStyle(id);
           break;
+        case 'flow':
+          useSoulStore.getState().toggleFlow(id);
+          break;
         case 'constraint':
           useSoulStore.getState().toggleConstraint(id);
           break;
@@ -169,30 +178,98 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
     [layerType]
   );
 
+  // 显示前 3 个项（折叠时）
+  const visibleItems = isExpanded ? items : items.slice(0, 3);
+  const hasMore = items.length > 3;
+  const selectedCount = selectedIds.length;
+
+  // 当父组件控制时，使用父组件的状态；否则使用内部状态
+  const isControlled = expandedFromParent !== undefined;
+  const isExpanded = isControlled ? expandedFromParent : expanded;
+
   return (
-    <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'hidden' }}>
-      <Group justify="space-between" mb="md">
-        <Title order={3} size="h5">{title}</Title>
+    <Card
+      withBorder
+      shadow="sm"
+      radius="md"
+      style={{ overflow: 'hidden', transition: 'all 0.3s ease' }}
+      _hover={{ shadow: 'md' }}
+    >
+      <Group
+        justify="space-between"
+        mb="xs"
+        onClick={onToggle}
+        style={{
+          cursor: 'pointer',
+          transition: 'background-color 0.2s ease',
+          borderRadius: 'var(--mantine-radius-md)',
+          padding: '4px 8px',
+          margin: '-4px -8px',
+        }}
+      >
+        <Group gap="xs" wrap="nowrap">
+          <ActionIcon
+            variant="transparent"
+            size="sm"
+            p={0}
+            style={{
+              transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+              transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <IconChevronDown size={18} />
+          </ActionIcon>
+          <Title order={3} size="h5">{title}</Title>
+        </Group>
         {inputType === 'multi' && (
-          <Badge variant="light" size="sm">
-            已选 {selectedIds.length}
+          <Badge
+            variant="light"
+            size="sm"
+            style={{ transition: 'transform 0.2s ease' }}
+          >
+            已选 {selectedCount}
           </Badge>
         )}
       </Group>
 
-      <ScrollArea style={{ maxHeight: 'calc(100vh - 250px)' }} offsetScrollbars>
-        <Box>
-          {items.map((item) => (
-            <LibraryItemCard
-              key={item.id}
-              item={item}
-              isSelected={selectedIds.includes(item.id)}
-              inputType={inputType}
-              onSelect={handleSelect}
-            />
-          ))}
-        </Box>
-      </ScrollArea>
+      <Collapse in={isExpanded} timeout={300}>
+        <ScrollArea style={{ maxHeight: 'calc(100vh - 250px)' }} offsetScrollbars type="hover">
+          <Box pb="xs">
+            {visibleItems.map((item) => (
+              <LibraryItemCard
+                key={item.id}
+                item={item}
+                isSelected={selectedIds.includes(item.id)}
+                inputType={inputType}
+                onSelect={handleSelect}
+              />
+            ))}
+            {!isControlled && !isExpanded && hasMore && (
+              <Text
+                size="xs"
+                c="dimmed"
+                ta="center"
+                py="xs"
+                onClick={(e) => {
+          e.stopPropagation();
+          if (isControlled) {
+            // 由父组件处理点击
+          } else {
+            setExpanded(!isExpanded);
+          }
+        }}
+                style={{
+                  cursor: 'pointer',
+                  transition: 'color 0.2s ease',
+                }}
+                _hover={{ color: 'var(--mantine-color-violet-7)' }}
+              >
+                展开 {items.length - 3} 更多...
+              </Text>
+            )}
+          </Box>
+        </ScrollArea>
+      </Collapse>
     </Card>
   );
 });
