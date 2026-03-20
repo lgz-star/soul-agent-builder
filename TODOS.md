@@ -38,6 +38,30 @@
 
 ## v1.1
 
+- [x] **P1: 空状态 redesign** — 添加 SVG 插图、引导按钮
+  - **Why:** 设计审计 High Impact 问题 #1
+  - **Status:** COMPLETED - EmptyState.tsx 重写，添加温暖的 SVG 插图和引导提示
+
+- [x] **P1: 添加焦点环样式** — 确保键盘导航可见
+  - **Why:** 设计审计 High Impact 问题 #2，无障碍访问问题
+  - **Status:** COMPLETED - main.tsx 添加全局 :focus-visible 样式
+
+- [x] **P1: 添加流程完成/导出入口** — 固定操作栏
+  - **Why:** 设计审计 High Impact 问题 #3
+  - **Status:** COMPLETED - App.tsx 顶部添加导出菜单和分享按钮
+
+- [x] **P2: 改进标题层级** — 添加 h1-h3 使用场景
+  - **Why:** 设计审计 Medium Impact 问题 #1
+  - **Status:** COMPLETED - App 标题 h1, 构建区 h2, 模块库 h3
+
+- [x] **P2: 改进卡片悬停效果** — 添加 hover 状态反馈
+  - **Why:** 设计审计 Medium Impact 问题 #2
+  - **Status:** COMPLETED - ModuleLibrary.tsx 添加悬停阴影、位移、边框变化
+
+- [x] **P3: 优化词库卡片文本层级** — 改进标题/描述/标签区分
+  - **Why:** 设计审计 Medium Impact 问题 #4
+  - **Status:** COMPLETED - ModuleLibrary.tsx 优化字重、行高、间距
+
 - [ ] OpenClaw 格式导出（需调研格式规范）
 - [ ] Claude Code 格式导出（需调研格式规范）
 
@@ -57,4 +81,4 @@
 ---
 
 **生成时间：** 2026-03-20
-**最后更新：** 2026-03-21 (/plan-eng-review 更新)
+**最后更新：** 2026-03-21 (/design-review 修复所有 High/Medium Impact 问题)
