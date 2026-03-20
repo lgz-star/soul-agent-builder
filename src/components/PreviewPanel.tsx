@@ -7,7 +7,6 @@ import {
   Stack,
   Divider,
   Group,
-  Button,
   Modal,
   TextInput,
   Textarea,
@@ -18,9 +17,9 @@ import {
   Badge,
   Skeleton,
 } from '@mantine/core';
-import { IconCopy, IconCheck, IconDownload, IconShare } from '@tabler/icons-react';
+import { IconCopy, IconCheck } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
-import { MarkdownExporter, JsonExporter } from '../exporters';
+import { MarkdownExporter } from '../exporters';
 import { EmptyState } from './EmptyState';
 
 interface PreviewPanelProps {
@@ -29,47 +28,44 @@ interface PreviewPanelProps {
 }
 
 export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
-  const { soul, setSoulName, setSoulDescription, exportToJson, generateShareLink } = useSoulStore();
+  const { soul, setSoulName, setSoulDescription } = useSoulStore();
   const [isShareModalOpen, setShareModalOpen] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
 
-  const handleExportMarkdown = () => {
-    if (!soul) return;
-    const exporter = new MarkdownExporter();
-    const content = exporter.export(soul);
-    downloadFile(content, `${soul.name}.md`, 'text/markdown');
-  };
-
-  const handleExportJson = () => {
-    try {
-      const content = exportToJson();
-      if (!soul) return;
-      downloadFile(content, `${soul.name}.json`, 'application/json');
-    } catch (error) {
-      alert(error instanceof Error ? error.message : '导出失败');
-    }
-  };
-
   const handleShare = () => {
-    const result = generateShareLink();
+    const result = useSoulStore.getState().generateShareLink();
     if (result.error) {
       alert(result.error);
+      return;
+    }
+    if (!result.url) {
+      alert('生成分享链接失败');
       return;
     }
     setShareUrl(result.url);
     setShareModalOpen(true);
   };
 
-  const downloadFile = (content: string, filename: string, type: string) => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // 分享链接复制（降级处理）
+  const copyShareLink = async () => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        alert('分享链接已复制到剪贴板！');
+      } else {
+        // 降级方案：创建临时 textarea
+        const textarea = document.createElement('textarea');
+        textarea.value = shareUrl;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('分享链接已复制到剪贴板！');
+      }
+    } catch (error) {
+      console.error('复制失败:', error);
+      alert('复制失败，请手动复制链接');
+    }
   };
 
   if (!soul) {
@@ -85,27 +81,7 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
       <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'auto' }}>
         <Group justify="space-between" mb="lg">
           <Title order={5}>预览</Title>
-          <Group gap="xs">
-            <Button size="xs" variant="light" leftSection={<IconShare size={14} />} onClick={handleShare}>
-              分享
-            </Button>
-            <Button
-              size="xs"
-              variant="light"
-              leftSection={<IconDownload size={14} />}
-              onClick={handleExportMarkdown}
-            >
-              Markdown
-            </Button>
-            <Button
-              size="xs"
-              variant="light"
-              leftSection={<IconDownload size={14} />}
-              onClick={handleExportJson}
-            >
-              JSON
-            </Button>
-          </Group>
+          {/* 导出和分享功能已移至顶部导航栏，此处移除重复按钮 */}
         </Group>
 
         {/* 元数据编辑 */}
@@ -261,23 +237,19 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
           <Text size="sm" c="dimmed">
             复制链接发送给他人，他们可以直接导入这个 Soul
           </Text>
-          <CopyButton value={shareUrl}>
-            {({ copied, copy }) => (
-              <Tooltip label={copied ? '已复制' : '复制'} withArrow position="right">
-                <ActionIcon
-                  color={copied ? 'teal' : 'gray'}
-                  variant={copied ? 'filled' : 'default'}
-                  onClick={copy}
-                  style={{ width: '100%', height: 'auto', padding: '12px' }}
-                >
-                  {copied ? <IconCheck size={18} /> : <IconCopy size={18} />}
-                  <Text size="xs" ml="xs" style={{ flex: 1, textAlign: 'left' }}>
-                    {shareUrl.slice(0, 50)}...
-                  </Text>
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </CopyButton>
+          <Button onClick={copyShareLink} variant="light" leftSection={<IconCopy size={18} />}>
+            复制分享链接
+          </Button>
+          {shareUrl && (
+            <Box>
+              <Text size="xs" c="dimmed" mb="xs">
+                链接预览：
+              </Text>
+              <Card padding="xs" withBorder style={{ wordBreak: 'break-all', backgroundColor: 'var(--mantine-color-gray-0)' }}>
+                <Text size="xs">{shareUrl}</Text>
+              </Card>
+            </Box>
+          )}
           {shareUrl.length > 2000 && (
             <Text size="xs" c="orange">
               链接较长，某些平台可能会被截断

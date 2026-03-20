@@ -109,6 +109,16 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
     soul.styles.length > 0
   );
 
+  // 左侧模块列表配置
+  const leftModules = [
+    { key: 'identity' as const, title: '身份', inputType: 'single' as const },
+    { key: 'ability' as const, title: '能力', inputType: 'multi' as const },
+    { key: 'style' as const, title: '风格', inputType: 'multi' as const },
+    { key: 'flow' as const, title: '流程', inputType: 'sort' as const },
+    { key: 'constraint' as const, title: '约束', inputType: 'multi' as const },
+    { key: 'tool' as const, title: '工具', inputType: 'multi' as const },
+  ];
+
   return (
     <Box style={{ minHeight: '100vh', backgroundColor: 'var(--mantine-color-gray-0)' }}>
       {/* 顶部导航栏 */}
@@ -166,11 +176,16 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
       {/* 主内容区 */}
       <Grid gutter="md" style={{ padding: '1rem', height: 'calc(100vh - 80px)' }}>
         {/* 左侧：模块库 - 桌面端显示全部，移动端隐藏 */}
-        <Grid.Col span={{ base: 12, md: 3 }} style={{ display: isMobile && ui.isPreviewOpen ? 'none' : 'block' }}>
-          <Stack gap="md" style={{ maxHeight: '100%', overflow: 'auto' }}>
-            <ModuleLibrary layerType="identity" title="身份" inputType="single" />
-            <ModuleLibrary layerType="ability" title="能力" inputType="multi" />
-            <ModuleLibrary layerType="style" title="风格" inputType="multi" />
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <Stack gap="md" style={{ height: 'calc(100vh - 120px)', overflow: 'auto' }}>
+            {leftModules.map((module) => (
+              <ModuleLibrary
+                key={module.key}
+                layerType={module.key}
+                title={module.title}
+                inputType={module.inputType}
+              />
+            ))}
           </Stack>
         </Grid.Col>
 
