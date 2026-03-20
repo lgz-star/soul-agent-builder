@@ -47,7 +47,14 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
       },
     }),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: (event) => {
+        // 阻止在输入框/文本域中使用空格键触发拖拽
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+          return null;
+        }
+        return sortableKeyboardCoordinates(event);
+      },
     })
   );
 
