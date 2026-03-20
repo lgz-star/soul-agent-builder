@@ -21,6 +21,12 @@ import { PreviewPanel } from './components/PreviewPanel';
 function App() {
   const { ui, setPreviewOpen, soul, exportToJson, generateShareLink } = useSoulStore();
   const [isMobile, setIsMobile] = React.useState(false);
+  const [expandedModule, setExpandedModule] = React.useState<string | null>('identity');
+
+  // 处理模块展开/折叠
+  const handleModuleToggle = (moduleKey: string) => {
+    setExpandedModule(prev => prev === moduleKey ? null : moduleKey);
+  };
 
   // 响应式检测
   React.useEffect(() => {
@@ -89,17 +95,23 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
 
   const handleShare = () => {
     try {
-      const { url, error } = generateShareLink();
-      if (error) {
-        console.error('生成分享链接失败:', error);
+      const result = useSoulStore.getState().generateShareLink();
+      if (result.error) {
+        console.error('生成分享链接失败:', result.error);
+        alert(result.error);
         return;
       }
-      if (url && navigator.clipboard) {
-        navigator.clipboard.writeText(url);
-        alert('分享链接已复制到剪贴板！');
+      if (!result.url) {
+        alert('生成分享链接失败');
+        return;
       }
+      // 打开预览面板并显示分享弹窗
+      setPreviewOpen(true);
+      // 使用自定义事件通知 PreviewPanel 打开分享弹窗
+      window.dispatchEvent(new CustomEvent('open-share-modal', { detail: { url: result.url } }));
     } catch (error) {
       console.error('分享失败:', error);
+      alert('分享失败，请重试');
     }
   };
 
@@ -184,6 +196,8 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
                 layerType={module.key}
                 title={module.title}
                 inputType={module.inputType}
+                isExpanded={expandedModule === module.key}
+                onToggle={() => handleModuleToggle(module.key)}
               />
             ))}
           </Stack>

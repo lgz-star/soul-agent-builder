@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Box,
   Title,
@@ -183,10 +183,6 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
   const hasMore = items.length > 3;
   const selectedCount = selectedIds.length;
 
-  // 当父组件控制时，使用父组件的状态；否则使用内部状态
-  const isControlled = expandedFromParent !== undefined;
-  const isExpanded = isControlled ? expandedFromParent : expanded;
-
   return (
     <Card
       withBorder
@@ -244,20 +240,13 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
                 onSelect={handleSelect}
               />
             ))}
-            {!isControlled && !isExpanded && hasMore && (
+            {!isExpanded && hasMore && (
               <Text
                 size="xs"
                 c="dimmed"
                 ta="center"
                 py="xs"
-                onClick={(e) => {
-          e.stopPropagation();
-          if (isControlled) {
-            // 由父组件处理点击
-          } else {
-            setExpanded(!isExpanded);
-          }
-        }}
+                onClick={(e) => { e.stopPropagation(); onToggle(); }}
                 style={{
                   cursor: 'pointer',
                   transition: 'color 0.2s ease',

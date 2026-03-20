@@ -33,6 +33,17 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
   const [isShareModalOpen, setShareModalOpen] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
 
+  // 监听打开分享弹窗的事件
+  React.useEffect(() => {
+    const handleOpenShareModal = (event: CustomEvent<{ url: string }>) => {
+      setShareUrl(event.detail.url);
+      setShareModalOpen(true);
+    };
+
+    window.addEventListener('open-share-modal', handleOpenShareModal as EventListener);
+    return () => window.removeEventListener('open-share-modal', handleOpenShareModal as EventListener);
+  }, []);
+
   const handleShare = () => {
     const result = useSoulStore.getState().generateShareLink();
     if (result.error) {

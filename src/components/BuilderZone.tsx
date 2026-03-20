@@ -10,6 +10,7 @@ import {
   Stack,
   Divider,
   Button,
+  Textarea,
   rem,
 } from '@mantine/core';
 import {
@@ -37,7 +38,7 @@ interface BuilderZoneProps {
 }
 
 export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
-  const { soul, setFlows, reorderFlows } = useSoulStore();
+  const { soul, setFlows, reorderFlows, setKnowledge } = useSoulStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -195,17 +196,13 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
           <Text fw={500} size="sm" mb="xs">
             知识
           </Text>
-          {soul.knowledge ? (
-            <Card padding="sm" withBorder>
-              <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-                {soul.knowledge}
-              </Text>
-            </Card>
-          ) : (
-            <Text c="dimmed" size="xs" italic>
-              未填写
-            </Text>
-          )}
+          <Textarea
+            placeholder="输入知识内容..."
+            value={soul.knowledge || ''}
+            onChange={(e) => setKnowledge(e.target.value)}
+            minRows={3}
+            autosize
+          />
         </Box>
 
         <Divider />
