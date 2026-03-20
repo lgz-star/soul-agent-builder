@@ -119,10 +119,10 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
               <IconBrain size={20} />
             </ThemeIcon>
             <div>
-              <Text fw={600} size="lg">
+              <Title order={1} fw={600} size="xl">
                 Soul & Agent 构建器
-              </Text>
-              <Text size="xs" c="dimmed">
+              </Title>
+              <Text size="sm" c="dimmed" mt={2}>
                 通过拖拽创建你的 AI 人格
               </Text>
             </div>

@@ -82,7 +82,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
   return (
     <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'auto' }}>
       <Group justify="space-between" mb="lg">
-        <Title order={5}>构建区</Title>
+        <Title order={2} size="h4">构建区</Title>
         {hasContent && (
           <Button size="xs" variant="light" onClick={onOpenPreview}>
             打开预览

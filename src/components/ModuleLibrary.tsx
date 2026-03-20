@@ -75,24 +75,33 @@ const LibraryItemCard = React.memo(function LibraryItemCard({
         cursor: 'pointer',
         backgroundColor: isSelected
           ? 'var(--mantine-color-violet-light)'
-          : undefined,
+          : 'white',
         borderColor: isSelected
           ? 'var(--mantine-color-violet)'
           : 'var(--mantine-color-gray-3)',
+        transition: 'all 0.2s ease',
+        transform: 'translateY(0)',
+      }}
+      component="div"
+      // Mantine 的 style props 用于悬停效果
+      _hover={{
+        shadow: 'md',
+        transform: 'translateY(-2px)',
+        borderColor: 'var(--mantine-color-violet-3)',
       }}
     >
       <Group justify="space-between" wrap="nowrap">
         <Box style={{ flex: 1 }}>
-          <Text fw={isSelected ? 600 : 400} size="sm">
+          <Text fw={isSelected ? 600 : 500} size="sm" lh={1.3}>
             {item.name}
           </Text>
           {item.description && (
-            <Text size="xs" c="dimmed" mt={2}>
+            <Text size="xs" c="dimmed" mt={4} lh={1.4}>
               {item.description}
             </Text>
           )}
           {item.category && (
-            <Badge variant="outline" size="xs" mt={2}>
+            <Badge variant="outline" size="xs" mt={6} color="gray">
               {item.category}
             </Badge>
           )}
@@ -163,7 +172,7 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
   return (
     <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'hidden' }}>
       <Group justify="space-between" mb="md">
-        <Title order={5}>{title}</Title>
+        <Title order={3} size="h5">{title}</Title>
         {inputType === 'multi' && (
           <Badge variant="light" size="sm">
             已选 {selectedIds.length}
