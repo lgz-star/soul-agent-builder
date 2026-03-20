@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createEmptySoul, type Soul, validateSoul } from '../soulStore.types';
+import { createEmptySoul, validateSoul } from '../soulStore.types';
 
-// 模拟 zustand 和 localStorage
+// 模拟 localStorage
 const mockLocalStorage = {
   data: {} as Record<string, string>,
-  getItem: vi.fn((key: string) => mockLocalStorage.data[key] || null),
-  setItem: vi.fn((key: string, value: string) => {
+  getItem: vi.fn((key: string): string | null => mockLocalStorage.data[key] || null),
+  setItem: vi.fn((key: string, value: string): void => {
     mockLocalStorage.data[key] = value;
   }),
-  removeItem: vi.fn((key: string) => {
+  removeItem: vi.fn((key: string): void => {
     delete mockLocalStorage.data[key];
   }),
-  clear: vi.fn(() => {
+  clear: vi.fn((): void => {
     mockLocalStorage.data = {};
   }),
 };

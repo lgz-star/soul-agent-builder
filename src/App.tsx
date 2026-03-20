@@ -1,13 +1,8 @@
 import React from 'react';
-import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Button, Menu, ActionIcon, Title } from '@mantine/core';
+import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Menu, ActionIcon, Title } from '@mantine/core';
 import {
-  IconUser,
   IconBrain,
-  IconPalette,
-  IconWorkflow,
   IconBook,
-  IconShield,
-  IconTools,
   IconDownload,
   IconShare,
   IconFileCode,
@@ -19,7 +14,7 @@ import { BuilderZone } from './components/BuilderZone';
 import { PreviewPanel } from './components/PreviewPanel';
 
 function App() {
-  const { ui, setPreviewOpen, soul, exportToJson, generateShareLink } = useSoulStore();
+  const { ui, setPreviewOpen, soul, exportToJson } = useSoulStore();
   const [isMobile, setIsMobile] = React.useState(false);
   const [expandedModule, setExpandedModule] = React.useState<string | null>('identity');
 
@@ -213,10 +208,7 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
           span={{ base: 12, md: 4 }}
           style={{ display: isMobile && !ui.isPreviewOpen ? 'none' : 'block' }}
         >
-          <PreviewPanel
-            isOpen={ui.isPreviewOpen}
-            onClose={() => setPreviewOpen(false)}
-          />
+          <PreviewPanel />
         </Grid.Col>
       </Grid>
     </Box>

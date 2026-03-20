@@ -14,7 +14,9 @@ import {
 } from '@mantine/core';
 import { IconPlus, IconCheck, IconChevronDown } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
-import type { LibraryItem, LayerType, Soul, FlowStep } from '../store/soulStore.types';
+import type { LibraryItem, FlowStep, Soul } from '../store/soulStore.types';
+
+type LayerType = 'identity' | 'ability' | 'style' | 'flow' | 'constraint' | 'tool';
 
 interface ModuleLibraryProps {
   layerType: 'identity' | 'ability' | 'style' | 'flow' | 'constraint' | 'tool';
@@ -24,14 +26,13 @@ interface ModuleLibraryProps {
   onToggle: () => void;
 }
 
-// 配置驱动方式：层类型到 store 数据的映射
-const layerConfig: Record<LayerType, { libraryKey: keyof SoulStore['libraries']; selectedKey: keyof Soul }> = {
-  identity: { libraryKey: 'identities', selectedKey: 'identity' },
-  ability: { libraryKey: 'abilities', selectedKey: 'abilities' },
-  style: { libraryKey: 'styles', selectedKey: 'styles' },
-  flow: { libraryKey: 'flows', selectedKey: 'flows' },
-  constraint: { libraryKey: 'constraints', selectedKey: 'constraints' },
-  tool: { libraryKey: 'tools', selectedKey: 'tools' },
+const layerConfig = {
+  identity: { libraryKey: 'identities' as const, selectedKey: 'identity' as const },
+  ability: { libraryKey: 'abilities' as const, selectedKey: 'abilities' as const },
+  style: { libraryKey: 'styles' as const, selectedKey: 'styles' as const },
+  flow: { libraryKey: 'flows' as const, selectedKey: 'flows' as const },
+  constraint: { libraryKey: 'constraints' as const, selectedKey: 'constraints' as const },
+  tool: { libraryKey: 'tools' as const, selectedKey: 'tools' as const },
 };
 
 // 获取当前选中的 ID 列表
@@ -87,12 +88,6 @@ const LibraryItemCard = React.memo(function LibraryItemCard({
         transform: 'translateY(0)',
       }}
       component="div"
-      // Mantine 的 style props 用于悬停效果
-      _hover={{
-        shadow: 'md',
-        transform: 'translateY(-2px)',
-        borderColor: 'var(--mantine-color-violet-3)',
-      }}
     >
       <Group justify="space-between" wrap="nowrap">
         <Box style={{ flex: 1 }}>
@@ -141,7 +136,6 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
 }: ModuleLibraryProps) {
   const { libraries, soul } = useSoulStore();
 
-  // 使用 useMemo 缓存计算结果
   const items = useMemo(() => {
     const { libraryKey } = layerConfig[layerType];
     return libraries[libraryKey];
@@ -165,7 +159,7 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
           useSoulStore.getState().toggleStyle(id);
           break;
         case 'flow':
-          useSoulStore.getState().toggleFlow(id);
+          useSoulStore.getState().setFlows([...(soul?.flows || []), { id, order: soul?.flows.length || 0 }]);
           break;
         case 'constraint':
           useSoulStore.getState().toggleConstraint(id);
@@ -189,7 +183,6 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
       shadow="sm"
       radius="md"
       style={{ overflow: 'hidden', transition: 'all 0.3s ease' }}
-      _hover={{ shadow: 'md' }}
     >
       <Group
         justify="space-between"
@@ -228,10 +221,10 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
         )}
       </Group>
 
-      <Collapse in={isExpanded} timeout={300}>
+      <Collapse in={isExpanded}>
         <ScrollArea style={{ maxHeight: 'calc(100vh - 250px)' }} offsetScrollbars type="hover">
           <Box pb="xs">
-            {visibleItems.map((item) => (
+            {visibleItems.map((item: LibraryItem) => (
               <LibraryItemCard
                 key={item.id}
                 item={item}
@@ -251,7 +244,8 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
                   cursor: 'pointer',
                   transition: 'color 0.2s ease',
                 }}
-                _hover={{ color: 'var(--mantine-color-violet-7)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--mantine-color-violet-7)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--mantine-color-dimmed)'; }}
               >
                 展开 {items.length - 3} 更多...
               </Text>

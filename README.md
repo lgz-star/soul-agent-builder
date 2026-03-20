@@ -2,7 +2,7 @@
 
 AI 人格创作工具 — 通过拖拽模块化组件，快速创建高质量 AI Agent/Soul
 
-**在线演示：** [TODO: GitHub Pages 链接]
+**在线演示：** https://lgz-star.github.io/soul-agent-builder/
 
 ---
 
@@ -110,6 +110,9 @@ soul-agent-builder/
 - [x] localStorage 自动保存
 - [x] 分享链接（base64）
 - [x] 预设词库
+- [x] 折叠式模块库
+- [x] 流程拖拽排序
+- [x] 知识层在线编辑
 
 ### v1.1
 - [ ] OpenClaw 导出
@@ -131,6 +134,12 @@ soul-agent-builder/
 ## 开发待办
 
 详见 [TODOS.md](./TODOS.md)
+
+---
+
+## 快速体验
+
+访问 [GitHub Pages 在线演示](https://lgz-star.github.io/soul-agent-builder/) 立即体验
 
 ---
 

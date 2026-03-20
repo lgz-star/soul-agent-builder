@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Title,
@@ -6,12 +5,10 @@ import {
   Card,
   Group,
   Badge,
-  ActionIcon,
   Stack,
   Divider,
   Button,
   Textarea,
-  rem,
 } from '@mantine/core';
 import {
   DndContext,
@@ -23,12 +20,10 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { IconTrash } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import { SortableItem } from './SortableItem';
 import { EmptyState } from './EmptyState';
@@ -38,7 +33,7 @@ interface BuilderZoneProps {
 }
 
 export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
-  const { soul, setFlows, reorderFlows, setKnowledge } = useSoulStore();
+  const { soul, setFlows, setKnowledge } = useSoulStore();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -47,7 +42,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
       },
     }),
     useSensor(KeyboardSensor, {
-      coordinateGetter: (event) => {
+      coordinateGetter: (event, args) => {
         // 阻止在输入框/文本域中使用键盘触发拖拽
         const target = event.target as HTMLElement;
         const isInteractive =
@@ -57,10 +52,10 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
           target.hasAttribute('contenteditable');
 
         if (isInteractive) {
-          return null;
+          return undefined;
         }
         // 只在非交互元素上允许键盘拖拽
-        return sortableKeyboardCoordinates(event);
+        return sortableKeyboardCoordinates(event, args) || undefined;
       },
     })
   );
@@ -81,7 +76,10 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
     if (over && active.id !== over.id) {
       const oldIndex = soul.flows.findIndex((f) => f.id === active.id);
       const newIndex = soul.flows.findIndex((f) => f.id === over.id);
-      reorderFlows(oldIndex, newIndex);
+      const newFlows = [...soul.flows];
+      const [moved] = newFlows.splice(oldIndex, 1);
+      newFlows.splice(newIndex, 0, moved);
+      setFlows(newFlows);
     }
   };
 
@@ -116,7 +114,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               <Text size="sm">{soul.identity}</Text>
             </Card>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}
@@ -138,7 +136,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               ))}
             </Group>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}
@@ -160,7 +158,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               ))}
             </Group>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}
@@ -197,7 +195,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               </SortableContext>
             </DndContext>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}
@@ -235,7 +233,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               ))}
             </Group>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}
@@ -257,7 +255,7 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
               ))}
             </Group>
           ) : (
-            <Text c="dimmed" size="xs" italic>
+            <Text c="dimmed" size="xs" style={{ fontStyle: 'italic' }}>
               未选择
             </Text>
           )}

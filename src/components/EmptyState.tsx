@@ -1,11 +1,9 @@
-import React from 'react';
 import { Box, Title, Text, Button, Card, Group, Stack } from '@mantine/core';
 import { IconSparkles, IconClick } from '@tabler/icons-react';
 
 interface EmptyStateProps {
   title?: string;
   description?: string;
-  icon?: React.ReactNode;
   showAction?: boolean;
   onAction?: () => void;
 }
@@ -13,7 +11,6 @@ interface EmptyStateProps {
 export function EmptyState({
   title = '开始创建',
   description = '从左侧选择模块开始创建你的 Soul',
-  icon,
   showAction = false,
   onAction,
 }: EmptyStateProps) {

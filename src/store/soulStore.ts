@@ -273,7 +273,6 @@ export const useSoulStore = create<SoulStore>()(
 
       // 存储操作（带防抖）
       saveToStorage: debounce(function () {
-        const state = get();
         try {
           // 数据已经在 persist middleware 中自动保存
           set((s) => ({

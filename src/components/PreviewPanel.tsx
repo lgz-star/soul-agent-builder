@@ -11,24 +11,14 @@ import {
   Modal,
   TextInput,
   Textarea,
-  CopyButton,
-  Tooltip,
-  ActionIcon,
   ScrollArea,
   Badge,
-  Skeleton,
 } from '@mantine/core';
-import { IconCopy, IconCheck } from '@tabler/icons-react';
+import { IconCopy } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
-import { MarkdownExporter } from '../exporters';
 import { EmptyState } from './EmptyState';
 
-interface PreviewPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
+export function PreviewPanel(): React.ReactElement {
   const { soul, setSoulName, setSoulDescription } = useSoulStore();
   const [isShareModalOpen, setShareModalOpen] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
@@ -43,20 +33,6 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
     window.addEventListener('open-share-modal', handleOpenShareModal as EventListener);
     return () => window.removeEventListener('open-share-modal', handleOpenShareModal as EventListener);
   }, []);
-
-  const handleShare = () => {
-    const result = useSoulStore.getState().generateShareLink();
-    if (result.error) {
-      alert(result.error);
-      return;
-    }
-    if (!result.url) {
-      alert('生成分享链接失败');
-      return;
-    }
-    setShareUrl(result.url);
-    setShareModalOpen(true);
-  };
 
   // 分享链接复制（降级处理）
   const copyShareLink = async () => {
@@ -93,7 +69,6 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
       <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'auto' }}>
         <Group justify="space-between" mb="lg">
           <Title order={5}>预览</Title>
-          {/* 导出和分享功能已移至顶部导航栏，此处移除重复按钮 */}
         </Group>
 
         {/* 元数据编辑 */}
