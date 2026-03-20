@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Button, Menu, ActionIcon } from '@mantine/core';
+import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Button, Menu, ActionIcon, Title } from '@mantine/core';
 import {
   IconUser,
   IconBrain,
