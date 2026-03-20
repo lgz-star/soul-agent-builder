@@ -14,6 +14,21 @@ export function escapeHtml(str: string): string {
 }
 
 /**
+ * HTML 实体解码（用于修复旧数据）
+ */
+export function unescapeHtml(str: string): string {
+  const unescapeMap: Record<string, string> = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#x27;': "'",
+    '&#x2F;': '/',
+  };
+  return str.replace(/&amp;|&lt;|&gt;|&quot;|&#x27;|&#x2F;/g, (match) => unescapeMap[match]);
+}
+
+/**
  * 验证输入是否安全（用于输入端验证）
  */
 export function validateInput(str: string, maxLength: number = 10000): { valid: boolean; error?: string } {

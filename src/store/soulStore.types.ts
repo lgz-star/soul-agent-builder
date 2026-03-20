@@ -89,6 +89,7 @@ export interface SoulActions {
   // 存储操作
   saveToStorage: () => void;
   loadFromStorage: () => void;
+  migrateLegacyData: () => boolean;
   clearSoul: () => void;
 
   // 导入导出

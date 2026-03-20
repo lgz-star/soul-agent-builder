@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { debounce } from '../utils/debounce';
+import { unescapeHtml } from '../utils/xss';
 import { toBase64, fromBase64 } from '../utils/base64';
 import type { Soul, FlowStep, SoulStore } from './soulStore.types';
 import { createEmptySoul, validateSoul } from './soulStore.types';
@@ -287,7 +288,38 @@ export const useSoulStore = create<SoulStore>()(
 
       loadFromStorage: () => {
         // persist middleware 会自动加载
-        // 这里可以添加自定义加载逻辑
+        // 这里可以添加自定义加载逻辑用于数据迁移
+      },
+
+      // 迁移旧数据（解码 HTML 实体）
+      migrateLegacyData: () => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+
+          const parsed = JSON.parse(raw);
+          if (!parsed.state?.soul) return false;
+
+          const soul = parsed.state.soul;
+          let migrated = false;
+
+          // 检查是否需要迁移（knowledge 字段包含 HTML 实体）
+          if (soul.knowledge && /&amp;|&lt;|&gt;|&quot;|&#x27;/.test(soul.knowledge)) {
+            soul.knowledge = unescapeHtml(soul.knowledge);
+            migrated = true;
+          }
+
+          if (migrated) {
+            parsed.state.soul = soul;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            return true;
+          }
+
+          return false;
+        } catch (error) {
+          console.error('数据迁移失败:', error);
+          return false;
+        }
       },
 
       clearSoul: () => {

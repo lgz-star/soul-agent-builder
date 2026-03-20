@@ -3,7 +3,15 @@ import ReactDOM from 'react-dom/client';
 import { MantineProvider, createTheme } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { useSoulStore } from './store/soulStore';
 import App from './App';
+
+// 迁移旧数据（在应用渲染前执行）
+try {
+  useSoulStore.getState().migrateLegacyData();
+} catch (error) {
+  console.error('数据迁移失败:', error);
+}
 
 const theme = createTheme({
   primaryColor: 'violet',
