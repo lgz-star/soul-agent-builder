@@ -1,0 +1,9 @@
+# 详见 https://github.com/YOUR_USERNAME/soul-agent-builder
+node_modules
+dist
+*.local
+.DS_Store
+coverage
+.playwright
+test-results
+.gstack/
