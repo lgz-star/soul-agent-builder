@@ -30,6 +30,7 @@ import {
 import { IconTrash, IconGripVertical } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import { SortableItem } from './SortableItem';
+import { EmptyState } from './EmptyState';
 
 interface BuilderZoneProps {
   onOpenPreview?: () => void;
@@ -51,20 +52,11 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
 
   if (!soul) {
     return (
-      <Card withBorder shadow="sm" radius="md" style={{ height: '100%' }}>
-        <Box
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-          }}
-        >
-          <Text c="dimmed" size="sm">
-            从左侧选择模块开始创建
-          </Text>
-        </Box>
-      </Card>
+      <EmptyState
+        title="开始创建"
+        description="从左侧选择模块开始创建你的 Soul"
+        showAction={false}
+      />
     );
   }
 
