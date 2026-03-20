@@ -65,6 +65,20 @@
 - [ ] OpenClaw 格式导出（需调研格式规范）
 - [ ] Claude Code 格式导出（需调研格式规范）
 
+## v1.1 剩余优化项（/design-review 2026-03-21 发现）
+
+- [ ] **P1: 触控目标优化** — 顶部图标按钮增至 44×44（无障碍）
+  - **Why:** 设计审计发现 N1，34×34 小于 44px 触控标准
+  - **Status:** DEFERRED - Polish 级别，不影响上线
+
+- [ ] **P3: 预览面板标题统一** — h5 → h3
+  - **Why:** 设计审计发现 N3，标题层级统一性
+  - **Status:** DEFERRED - Polish 级别
+
+- [ ] **P3: Loading 状态完善** — Skeleton 组件实际使用于空状态
+  - **Why:** 设计审计发现 P3，Skeleton 已导入但未使用
+  - **Status:** DEFERRED - Polish 级别
+
 ## v1.5
 
 - [ ] AI 一键生成 Soul
