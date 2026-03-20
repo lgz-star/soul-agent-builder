@@ -48,11 +48,18 @@ export function BuilderZone({ onOpenPreview }: BuilderZoneProps) {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: (event) => {
-        // 阻止在输入框/文本域中使用空格键触发拖拽
+        // 阻止在输入框/文本域中使用键盘触发拖拽
         const target = event.target as HTMLElement;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        const isInteractive =
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable ||
+          target.hasAttribute('contenteditable');
+
+        if (isInteractive) {
           return null;
         }
+        // 只在非交互元素上允许键盘拖拽
         return sortableKeyboardCoordinates(event);
       },
     })
