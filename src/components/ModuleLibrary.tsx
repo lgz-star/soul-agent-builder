@@ -158,9 +158,20 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
         case 'style':
           useSoulStore.getState().toggleStyle(id);
           break;
-        case 'flow':
-          useSoulStore.getState().setFlows([...(soul?.flows || []), { id, order: soul?.flows.length || 0 }]);
+        case 'flow': {
+          const state = useSoulStore.getState();
+          const exists = state.soul?.flows.some((f) => f.id === id);
+          if (exists) {
+            // 已存在则移除
+            const newFlows = (state.soul?.flows || []).filter((f) => f.id !== id);
+            state.setFlows(newFlows);
+          } else {
+            // 不存在则添加
+            const newFlows = [...(state.soul?.flows || []), { id, order: state.soul?.flows.length || 0 }];
+            state.setFlows(newFlows);
+          }
           break;
+        }
         case 'constraint':
           useSoulStore.getState().toggleConstraint(id);
           break;
