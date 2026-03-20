@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { debounce } from '../utils/debounce';
-import { escapeHtml } from '../utils/xss';
 import { toBase64, fromBase64 } from '../utils/base64';
 import type { Soul, FlowStep, SoulStore } from './soulStore.types';
 import { createEmptySoul, validateSoul } from './soulStore.types';
@@ -170,12 +169,10 @@ export const useSoulStore = create<SoulStore>()(
 
       // 知识层操作
       setKnowledge: (knowledge: string) => {
-        // XSS 防护：输入时转义
-        const sanitizedKnowledge = escapeHtml(knowledge);
         set((state) => {
           const newSoul = state.soul
-            ? { ...state.soul, knowledge: sanitizedKnowledge, updatedAt: new Date().toISOString() }
-            : { ...createEmptySoul(), knowledge: sanitizedKnowledge };
+            ? { ...state.soul, knowledge, updatedAt: new Date().toISOString() }
+            : { ...createEmptySoul(), knowledge };
 
           // 验证 Soul 完整性
           const validation = validateSoul(newSoul);
