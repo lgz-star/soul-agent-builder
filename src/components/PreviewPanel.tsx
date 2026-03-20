@@ -15,6 +15,8 @@ import {
   Tooltip,
   ActionIcon,
   ScrollArea,
+  Badge,
+  Skeleton,
 } from '@mantine/core';
 import { IconCopy, IconCheck, IconDownload, IconShare } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
@@ -286,34 +288,3 @@ export function PreviewPanel({ isOpen, onClose }: PreviewPanelProps) {
     </>
   );
 }
-
-// 需要 Badge 组件
-const Badge = ({ children, variant, color, size }: { children: React.ReactNode; variant?: string; color?: string; size?: string }) => (
-  <Box
-    component="span"
-    style={{
-      display: 'inline-block',
-      padding: '2px 8px',
-      borderRadius: '4px',
-      fontSize: size === 'xs' ? '11px' : '12px',
-      backgroundColor:
-        variant === 'light'
-          ? color === 'red'
-            ? 'var(--mantine-color-red-1)'
-            : color === 'blue'
-            ? 'var(--mantine-color-blue-1)'
-            : 'var(--mantine-color-violet-1)'
-          : 'transparent',
-      border: variant === 'outline' ? '1px solid var(--mantine-color-gray-4)' : 'none',
-      color:
-        color === 'red'
-          ? 'var(--mantine-color-red-7)'
-          : color === 'blue'
-          ? 'var(--mantine-color-blue-7)'
-          : 'var(--mantine-color-violet-7)',
-      margin: '2px',
-    }}
-  >
-    {children}
-  </Box>
-);
