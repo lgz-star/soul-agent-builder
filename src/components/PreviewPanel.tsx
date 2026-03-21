@@ -18,12 +18,28 @@ import {
 import { IconCopy } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import { EmptyState } from './EmptyState';
+import { useTranslation } from '../i18n';
+import {
+  identityLibrary,
+  abilityLibrary,
+  styleLibrary,
+  flowLibrary,
+  constraintLibrary,
+  toolLibrary,
+} from '../i18n/libraries';
 
 export function PreviewPanel(): React.ReactElement {
-  const { soul, setSoulName, setSoulDescription } = useSoulStore();
+  const { soul, setSoulName, setSoulDescription, language } = useSoulStore();
+  const { t } = useTranslation();
   const [isShareModalOpen, setShareModalOpen] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
+
+  // 获取库条目的本地化名称
+  const getLocalizedName = (id: string, library: { id: string; name: string | { zh: string; en: string } }[]): string => {
+    const item = library.find((i) => i.id === id);
+    return item ? (typeof item.name === 'object' ? item.name[language] : item.name) : id;
+  };
 
   // 模拟加载状态
   React.useEffect(() => {
@@ -47,7 +63,7 @@ export function PreviewPanel(): React.ReactElement {
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
-        alert('分享链接已复制到剪贴板！');
+        alert(language === 'zh' ? '分享链接已复制到剪贴板！' : 'Share link copied to clipboard!');
       } else {
         // 降级方案：创建临时 textarea
         const textarea = document.createElement('textarea');
@@ -56,11 +72,11 @@ export function PreviewPanel(): React.ReactElement {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        alert('分享链接已复制到剪贴板！');
+        alert(language === 'zh' ? '分享链接已复制到剪贴板！' : 'Share link copied to clipboard!');
       }
     } catch (error) {
       console.error('复制失败:', error);
-      alert('复制失败，请手动复制链接');
+      alert(language === 'zh' ? '复制失败，请手动复制链接' : 'Copy failed, please copy the link manually');
     }
   };
 
@@ -76,7 +92,7 @@ export function PreviewPanel(): React.ReactElement {
     <>
       <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'auto' }}>
         <Group justify="space-between" mb="lg">
-          <Title order={3}>预览</Title>
+          <Title order={3}>{t('ui.preview')}</Title>
         </Group>
 
         {/* 元数据编辑 */}
@@ -89,16 +105,16 @@ export function PreviewPanel(): React.ReactElement {
           ) : (
             <>
               <TextInput
-                label="名称"
+                label={t('layers.identity')}
                 value={soul.name}
                 onChange={(e) => setSoulName(e.target.value)}
-                placeholder="输入 Soul 名称"
+                placeholder={language === 'zh' ? '输入 Soul 名称' : 'Enter Soul name'}
               />
               <Textarea
-                label="描述"
+                label={language === 'zh' ? '描述' : 'Description'}
                 value={soul.description || ''}
                 onChange={(e) => setSoulDescription(e.target.value)}
-                placeholder="输入 Soul 描述"
+                placeholder={language === 'zh' ? '输入 Soul 描述' : 'Enter Soul description'}
                 minRows={2}
               />
             </>
@@ -111,52 +127,52 @@ export function PreviewPanel(): React.ReactElement {
         <ScrollArea style={{ maxHeight: 'calc(100vh - 400px)' }}>
           <Box>
             <Text size="xs" c="dimmed" mb="xs">
-              身份
+              {t('layers.identity')}
             </Text>
             <Card padding="sm" withBorder mb="md">
-              <Text size="sm">{soul.identity || '未选择'}</Text>
+              <Text size="sm">{soul.identity ? getLocalizedName(soul.identity, identityLibrary) : t('status.notSelected')}</Text>
             </Card>
 
             <Text size="xs" c="dimmed" mb="xs">
-              能力
+              {t('layers.ability')}
             </Text>
             <Card padding="sm" withBorder mb="md">
               {soul.abilities.length > 0 ? (
                 <Group wrap="wrap">
                   {soul.abilities.map((id) => (
                     <Badge key={id} variant="light">
-                      {id}
+                      {getLocalizedName(id, abilityLibrary)}
                     </Badge>
                   ))}
                 </Group>
               ) : (
                 <Text c="dimmed" size="xs">
-                  未选择
+                  {t('status.notSelected')}
                 </Text>
               )}
             </Card>
 
             <Text size="xs" c="dimmed" mb="xs">
-              风格
+              {t('layers.style')}
             </Text>
             <Card padding="sm" withBorder mb="md">
               {soul.styles.length > 0 ? (
                 <Group wrap="wrap">
                   {soul.styles.map((id) => (
                     <Badge key={id} variant="outline">
-                      {id}
+                      {getLocalizedName(id, styleLibrary)}
                     </Badge>
                   ))}
                 </Group>
               ) : (
                 <Text c="dimmed" size="xs">
-                  未选择
+                  {t('status.notSelected')}
                 </Text>
               )}
             </Card>
 
             <Text size="xs" c="dimmed" mb="xs">
-              流程
+              {t('layers.flow')}
             </Text>
             <Card padding="sm" withBorder mb="md">
               {soul.flows.length > 0 ? (
@@ -165,13 +181,13 @@ export function PreviewPanel(): React.ReactElement {
                     .sort((a, b) => a.order - b.order)
                     .map((flow) => (
                       <li key={flow.id}>
-                        <Text size="sm">{flow.id}</Text>
+                        <Text size="sm">{getLocalizedName(flow.id, flowLibrary)}</Text>
                       </li>
                     ))}
                 </ol>
               ) : (
                 <Text c="dimmed" size="xs">
-                  未选择
+                  {t('status.notSelected')}
                 </Text>
               )}
             </Card>
@@ -179,7 +195,7 @@ export function PreviewPanel(): React.ReactElement {
             {soul.knowledge && (
               <>
                 <Text size="xs" c="dimmed" mb="xs">
-                  知识
+                  {t('layers.knowledge')}
                 </Text>
                 <Card padding="sm" withBorder mb="md">
                   <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
@@ -190,39 +206,39 @@ export function PreviewPanel(): React.ReactElement {
             )}
 
             <Text size="xs" c="dimmed" mb="xs">
-              约束
+              {t('layers.constraint')}
             </Text>
             <Card padding="sm" withBorder mb="md">
               {soul.constraints.length > 0 ? (
                 <Group wrap="wrap">
                   {soul.constraints.map((id) => (
                     <Badge key={id} color="red" variant="light">
-                      {id}
+                      {getLocalizedName(id, constraintLibrary)}
                     </Badge>
                   ))}
                 </Group>
               ) : (
                 <Text c="dimmed" size="xs">
-                  未选择
+                  {t('status.notSelected')}
                 </Text>
               )}
             </Card>
 
             <Text size="xs" c="dimmed" mb="xs">
-              工具
+              {t('layers.tool')}
             </Text>
             <Card padding="sm" withBorder>
               {soul.tools.length > 0 ? (
                 <Group wrap="wrap">
                   {soul.tools.map((id) => (
                     <Badge key={id} color="blue" variant="light">
-                      {id}
+                      {getLocalizedName(id, toolLibrary)}
                     </Badge>
                   ))}
                 </Group>
               ) : (
                 <Text c="dimmed" size="xs">
-                  未选择
+                  {t('status.notSelected')}
                 </Text>
               )}
             </Card>
@@ -234,20 +250,22 @@ export function PreviewPanel(): React.ReactElement {
       <Modal
         opened={isShareModalOpen}
         onClose={() => setShareModalOpen(false)}
-        title="分享 Soul"
+        title={t('share.title')}
         size="lg"
       >
         <Stack gap="md">
           <Text size="sm" c="dimmed">
-            复制链接发送给他人，他们可以直接导入这个 Soul
+            {language === 'zh'
+              ? '复制链接发送给他人，他们可以直接导入这个 Soul'
+              : 'Copy the link and send it to others, they can import this Soul directly'}
           </Text>
           <Button onClick={copyShareLink} variant="light" leftSection={<IconCopy size={18} />}>
-            复制分享链接
+            {t('share.copyLink')}
           </Button>
           {shareUrl && (
             <Box>
               <Text size="xs" c="dimmed" mb="xs">
-                链接预览：
+                {t('share.linkPreview')}
               </Text>
               <Card padding="xs" withBorder style={{ wordBreak: 'break-all', backgroundColor: 'var(--mantine-color-gray-0)' }}>
                 <Text size="xs">{shareUrl}</Text>
@@ -256,7 +274,7 @@ export function PreviewPanel(): React.ReactElement {
           )}
           {shareUrl.length > 2000 && (
             <Text size="xs" c="orange">
-              链接较长，某些平台可能会被截断
+              {language === 'zh' ? '链接较长，某些平台可能会被截断' : 'Link is long, may be truncated on some platforms'}
             </Text>
           )}
         </Stack>

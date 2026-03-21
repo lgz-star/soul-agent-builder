@@ -10,7 +10,9 @@
     "deploy": "bun run build && npx gh-pages -d dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext ts,tsx"
+    "lint": "eslint src --ext ts,tsx",
+    "server": "bun run server/index.ts",
+    "dev:all": "concurrently \"bun run dev\" \"bun run server\""
   },
   "keywords": [
     "ai",
@@ -28,6 +30,7 @@
     "@mantine/core": "^7.0.0",
     "@mantine/hooks": "^7.0.0",
     "@tabler/icons-react": "^3.40.0",
+    "hono": "^4.12.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zustand": "^4.4.0"
@@ -38,6 +41,7 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^9.2.1",
     "gh-pages": "^6.0.0",
     "jsdom": "^22.0.0",
     "typescript": "^5.0.0",

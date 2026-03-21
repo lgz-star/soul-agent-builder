@@ -1,19 +1,31 @@
-import { Box, Title, Text, Button, Card, Group, Stack } from '@mantine/core';
+import { Box, Title, Text, Button, Card, Group, Stack, ThemeIcon } from '@mantine/core';
 import { IconSparkles, IconClick } from '@tabler/icons-react';
+import { useSoulStore } from '../store/soulStore';
+import { useTranslation } from '../i18n';
 
 interface EmptyStateProps {
   title?: string;
   description?: string;
   showAction?: boolean;
   onAction?: () => void;
+  // 新增：引导提示
+  hint?: string;
 }
 
 export function EmptyState({
-  title = '开始创建',
-  description = '从左侧选择模块开始创建你的 Soul',
+  title,
+  description,
   showAction = false,
   onAction,
+  hint,
 }: EmptyStateProps) {
+  const { language } = useSoulStore();
+  const { t } = useTranslation();
+
+  const defaultTitle = title || t('empty.startCreatingTitle');
+  const defaultDesc = description || t('empty.startCreatingDesc');
+  const defaultHint = hint || (language === 'zh' ? '点击左侧卡片选择模块' : 'Click cards on the left to select modules');
+
   return (
     <Card
       withBorder
@@ -69,10 +81,10 @@ export function EmptyState({
         {/* 标题和描述 */}
         <Stack align="center" gap="xs">
           <Title order={4} style={{ textAlign: 'center' }}>
-            {title}
+            {defaultTitle}
           </Title>
           <Text size="sm" c="dimmed" style={{ textAlign: 'center', maxWidth: '280px' }}>
-            {description}
+            {defaultDesc}
           </Text>
         </Stack>
 
@@ -86,17 +98,21 @@ export function EmptyState({
             size="md"
             radius="md"
           >
-            开始创建你的第一个 Soul
+            {language === 'zh' ? '开始创建你的第一个 Soul' : 'Start Creating Your First Soul'}
           </Button>
         )}
 
         {/* 提示 */}
-        <Group gap="xs" style={{ opacity: 0.6 }}>
-          <IconClick size={14} />
-          <Text size="xs" c="dimmed">
-            点击左侧卡片选择模块
-          </Text>
-        </Group>
+        <Card padding="xs" radius="md" withBorder style={{ backgroundColor: 'var(--mantine-color-gray-0)' }}>
+          <Group gap="xs" justify="center">
+            <ThemeIcon size="sm" radius="xl" variant="light" color="gray">
+              <IconClick size={14} />
+            </ThemeIcon>
+            <Text size="sm" c="dimmed">
+              {defaultHint}
+            </Text>
+          </Group>
+        </Card>
       </Stack>
     </Card>
   );

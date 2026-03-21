@@ -11,6 +11,7 @@ import {
   Select,
   Box,
   Collapse,
+  Checkbox,
 } from '@mantine/core';
 import { IconKey, IconCheck, IconX, IconRobot, IconAlertCircle, IconWorld } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
@@ -34,6 +35,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ opened, onClose })
   const [apiKey, setApiKey] = useState(llmConfig?.apiKey || '');
   const [baseURL, setBaseURL] = useState(llmConfig?.baseURL || '');
   const [model, setModel] = useState(llmConfig?.model || '');
+  const [useProxy, setUseProxy] = useState(llmConfig?.useProxy || false);
+  const [proxyUrl, setProxyUrl] = useState(llmConfig?.proxyUrl || 'http://localhost:3001');
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<{ valid: boolean; error?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +83,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ opened, onClose })
       apiKey: apiKey.trim(),
       baseURL: baseURL.trim(),
       model: model.trim(),
+      useProxy,
+      proxyUrl,
     });
     setError(null);
     onClose();
@@ -100,6 +105,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ opened, onClose })
         apiKey: apiKey.trim(),
         baseURL: baseURL.trim(),
         model: model.trim(),
+        useProxy,
+        proxyUrl,
       });
       setValidationResult(result);
       if (!result.valid) {
@@ -252,6 +259,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ opened, onClose })
             </Text>
           </Box>
         )}
+
+        {/* 后端代理设置 */}
+        <Box>
+          <Checkbox
+            label="使用后端代理（解决 CORS 问题）"
+            description="启动后端服务后勾选，可避免浏览器 CORS 限制"
+            checked={useProxy}
+            onChange={(e) => setUseProxy(e.currentTarget.checked)}
+            mb="sm"
+          />
+          <Collapse in={useProxy}>
+            <TextInput
+              label="后端代理地址"
+              placeholder="http://localhost:3001"
+              value={proxyUrl}
+              onChange={(e) => {
+                setProxyUrl(e.target.value);
+                setError(null);
+              }}
+              leftSection={<IconWorld size={18} />}
+              autoComplete="off"
+            />
+            <Text size="xs" c="dimmed" mt="xs">
+              后端代理服务地址，默认为 <code>http://localhost:3001</code>
+              <br />
+              启动命令：<code>bun run server</code>
+            </Text>
+          </Collapse>
+        </Box>
 
         {error && (
           <Alert icon={<IconAlertCircle size={18} />} color="red" variant="light">
