@@ -11,8 +11,8 @@ export type LayerType =
 
 export interface LibraryItem {
   id: string;
-  name: string;
-  description?: string;
+  name: string | { zh: string; en: string };
+  description?: string | { zh: string; en: string };
   category?: string;
 }
 
@@ -57,6 +57,28 @@ export interface SoulState {
     isSaving: boolean;
     lastSaved?: string;
   };
+  language: 'zh' | 'en';
+  llm: {
+    config?: LLMConfig;
+  };
+}
+
+// 模板类型（避免循环依赖）
+export interface SoulTemplateData {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  soul: Omit<Soul, 'name' | 'version' | 'createdAt' | 'updatedAt'>;
+}
+
+// LLM API 配置
+export interface LLMConfig {
+  apiKey: string;
+  baseURL: string;
+  model: string;
+  useProxy?: boolean;  // 是否使用后端代理
+  proxyUrl?: string;   // 后端代理地址（可选，默认 http://localhost:3001）
 }
 
 export interface SoulActions {
@@ -98,8 +120,20 @@ export interface SoulActions {
   generateShareLink: () => { url: string; error?: string };
   importFromShareLink: (url: string) => { soul: Soul; error?: string };
 
+  // 模板操作
+  loadTemplate: (template: SoulTemplateData) => void;
+
   // UI 操作
   setPreviewOpen: (open: boolean) => void;
+
+  // 语言设置
+  setLanguage: (lang: 'zh' | 'en') => void;
+
+  // LLM API 配置管理
+  setLLMConfig: (config: LLMConfig) => void;
+  getLLMConfig: () => LLMConfig | undefined;
+  clearLLMConfig: () => void;
+  validateLLMConfig: () => Promise<{ valid: boolean; error?: string }>;
 }
 
 export type SoulStore = SoulState & SoulActions;

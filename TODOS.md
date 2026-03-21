@@ -81,10 +81,65 @@
 
 ## v1.5
 
-- [ ] AI 一键生成 Soul
-- [ ] 内置测试对话功能
-- [ ] GitHub 抓取自动解析
-- [ ] 模板画廊
+### Phase 1: 模板画廊 (Template Gallery) - COMPLETED
+
+- [x] **P0: 创建模板数据结构** — `src/data/templates.ts` 定义 14 个预设模板
+  - **Why:** 为新手用户提供快速开始的预设配置
+  - **Status:** COMPLETED - 涵盖前端、后端、AI、数据、DevOps 5 个类别
+- [x] **P0: 创建 TemplateGallery 组件** — `src/components/TemplateGallery.tsx`
+  - **Why:** 展示模板的 UI 组件，支持分类浏览和一键加载
+  - **Status:** COMPLETED - 按类别分组显示，支持 i18n
+- [x] **P0: 添加 loadTemplate 方法** — `src/store/soulStore.ts`
+  - **Why:** 从 store 层面支持模板加载逻辑
+  - **Status:** COMPLETED - 加载时自动验证 Soul 完整性
+- [x] **P0: 集成到 App.tsx** — 左侧面板添加模板画廊
+  - **Why:** 用户入口，放在模块库上方
+  - **Status:** COMPLETED - 默认展开，位于左侧顶部
+- [x] **P1: 添加 i18n 翻译** — 中英文模板名称/描述
+  - **Why:** 支持国际化
+  - **Status:** COMPLETED - zh.ts 和 en.ts 添加完整翻译
+
+### Phase 2: AI 一键生成 Soul - COMPLETED
+
+- [x] **P0: 创建 LLM 服务层** — `src/services/llmService.ts`
+  - **Why:** 封装 LLM API 调用，支持 OpenAI 兼容格式和 Anthropic 格式
+  - **Status:** COMPLETED - 支持自定义 base_url、API Key、模型
+- [x] **P0: LLM API 配置管理** — 添加到 soulStore，存储在 localStorage
+  - **Why:** 用户需要配置 LLM API 信息才能使用 AI 功能
+  - **Status:** COMPLETED - setLLMConfig/getLLMConfig/clearLLMConfig/validateLLMConfig
+- [x] **P0: 创建 SettingsModal 组件** — 设置面板管理 LLM 配置
+  - **Why:** 用户配置 LLM API 的入口
+  - **Status:** COMPLETED - 支持预设选择 (Claude/OpenAI/Ollama/ 自定义) 和验证
+- [x] **P0: 创建 AIGenerateModal 组件** — AI 生成对话框
+  - **Why:** 用户输入需求生成 Soul 的界面
+  - **Status:** COMPLETED - 支持示例提示、错误处理、加载状态
+- [x] **P0: 集成到 App.tsx** — 添加 AI 生成按钮和设置入口
+  - **Why:** 用户访问入口
+  - **Status:** COMPLETED - 顶部添加渐变按钮和设置图标
+- [x] **P1: 添加 i18n 翻译** — 设置和 AI 生成界面
+  - **Why:** 支持国际化
+  - **Status:** COMPLETED - zh.ts 和 en.ts 添加完整翻译
+- [x] **P0: 添加后端代理服务** — 解决 CORS 跨域限制
+  - **Why:** 浏览器 CORS 限制阻止直接调用 LLM API
+  - **Status:** COMPLETED - Hono 后端代理已实现，运行在 http://localhost:3001
+  - **新增命令:** `bun run server` (仅后端) / `bun run dev:all` (前后端同时)
+- [x] **P1: 添加进度指示器** — 三步可视化（分析需求 → 生成配置 → 完成）
+  - **Why:** 用户需要知道 AI 生成的进度状态
+  - **Status:** COMPLETED - AIGenerateModal 添加 Stepper 组件和进度条
+- [x] **P1: 添加取消功能** — 支持随时终止正在进行的生成请求
+  - **Why:** 用户可能需要取消长时间运行的请求
+  - **Status:** COMPLETED - AbortController 实现，取消按钮
+- [x] **P0: 修复 Base64 工具兼容性** — 支持 Node.js/Bun 测试环境
+  - **Why:** 测试失败，Base64 在 Bun 环境返回空字符串
+  - **Status:** COMPLETED - 添加 Buffer API 支持
+- [x] **P0: 修复知识层 XSS 问题** — HTML 转义安全
+  - **Why:** 安全漏洞，用户输入未转义
+  - **Status:** COMPLETED - setKnowledge 添加 escapeHtml 调用
+
+### Remaining
+
+- [ ] **Phase 3: GitHub 抓取自动解析** — 需要 GitHub API
+- [ ] **Phase 4: 内置测试对话功能** — 复用 LLM 服务
 
 ## v2.0
 
@@ -95,4 +150,4 @@
 ---
 
 **生成时间：** 2026-03-20
-**最后更新：** 2026-03-21 (/design-review 修复所有 High/Medium Impact 问题)
+**最后更新：** 2026-03-22 (v1.0.1.0 - AI 生成进度指示器、取消功能、Base64 修复、XSS 修复)

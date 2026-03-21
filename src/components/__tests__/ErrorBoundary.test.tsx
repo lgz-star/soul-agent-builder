@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { MantineProvider, createTheme } from '@mantine/core';
@@ -15,16 +15,16 @@ const ThrowErrorComponent = () => {
 };
 
 // Mock window.matchMedia (Mantine 需要)
-const matchMediaMock = vi.fn(() => ({
+const matchMediaMock = () => ({
   matches: false,
   media: '',
   onchange: null,
-  addListener: vi.fn(),
-  removeListener: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
-}));
+  addListener: () => {},
+  removeListener: () => {},
+  addEventListener: () => {},
+  removeEventListener: () => {},
+  dispatchEvent: () => {},
+});
 
 // 包装器组件提供 Mantine 上下文
 const renderWithProviders = (ui: React.ReactElement) => {
@@ -50,7 +50,6 @@ describe('ErrorBoundary', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
     // 恢复原始 window.location
     Object.defineProperty(window, 'location', {
       value: originalLocation,

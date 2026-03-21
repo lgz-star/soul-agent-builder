@@ -1,12 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { debounce } from '../utils/debounce';
-import { unescapeHtml } from '../utils/xss';
+import { escapeHtml, unescapeHtml } from '../utils/xss';
 import { toBase64, fromBase64 } from '../utils/base64';
-import type { Soul, FlowStep, SoulStore } from './soulStore.types';
+import type { Soul, FlowStep, SoulStore, LLMConfig } from './soulStore.types';
 import { createEmptySoul, validateSoul } from './soulStore.types';
-
-// 词库数据
 import {
   identityLibrary,
   abilityLibrary,
@@ -14,9 +12,11 @@ import {
   flowLibrary,
   constraintLibrary,
   toolLibrary,
-} from '../data/libraries';
+} from '../i18n/libraries';
+import { validateAPI as validateLLMAPI } from '../services/llmService';
 
 const STORAGE_KEY = 'soul-builder-data';
+const LLM_CONFIG_STORAGE_KEY = 'soul-builder-llm-config';
 const DEBOUNCE_MS = 500;
 
 export const useSoulStore = create<SoulStore>()(
@@ -24,6 +24,7 @@ export const useSoulStore = create<SoulStore>()(
     (set, get) => ({
       // 初始状态
       soul: null,
+      language: 'zh',
       libraries: {
         identities: identityLibrary,
         abilities: abilityLibrary,
@@ -37,6 +38,14 @@ export const useSoulStore = create<SoulStore>()(
         isPreviewOpen: false,
         isSaving: false,
         lastSaved: undefined,
+      },
+      llm: {
+        config: undefined,
+      },
+
+      // 语言设置
+      setLanguage: (lang: 'zh' | 'en') => {
+        set({ language: lang });
       },
 
       // 身份层操作
@@ -171,9 +180,11 @@ export const useSoulStore = create<SoulStore>()(
       // 知识层操作
       setKnowledge: (knowledge: string) => {
         set((state) => {
+          // 转义 HTML 防止 XSS
+          const escapedKnowledge = escapeHtml(knowledge);
           const newSoul = state.soul
-            ? { ...state.soul, knowledge, updatedAt: new Date().toISOString() }
-            : { ...createEmptySoul(), knowledge };
+            ? { ...state.soul, knowledge: escapedKnowledge, updatedAt: new Date().toISOString() }
+            : { ...createEmptySoul(), knowledge: escapedKnowledge };
 
           // 验证 Soul 完整性
           const validation = validateSoul(newSoul);
@@ -298,19 +309,25 @@ export const useSoulStore = create<SoulStore>()(
           if (!raw) return false;
 
           const parsed = JSON.parse(raw);
-          if (!parsed.state?.soul) return false;
+          if (!parsed.state) return false;
 
-          const soul = parsed.state.soul;
           let migrated = false;
 
-          // 检查是否需要迁移（knowledge 字段包含 HTML 实体）
-          if (soul.knowledge && /&amp;|&lt;|&gt;|&quot;|&#x27;/.test(soul.knowledge)) {
-            soul.knowledge = unescapeHtml(soul.knowledge);
+          // 迁移 soul.knowledge 的 HTML 实体
+          if (parsed.state.soul?.knowledge && /&amp;|&lt;|&gt;|&quot;|&#x27;/.test(parsed.state.soul.knowledge)) {
+            parsed.state.soul.knowledge = unescapeHtml(parsed.state.soul.knowledge);
+            migrated = true;
+          }
+
+          // 初始化 language 字段（如果没有）
+          if (parsed.state.language === undefined) {
+            // 尝试从浏览器语言检测
+            const browserLang = typeof navigator !== 'undefined' ? navigator.language : 'zh';
+            parsed.state.language = browserLang.startsWith('zh') ? 'zh' : 'en';
             migrated = true;
           }
 
           if (migrated) {
-            parsed.state.soul = soul;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
             return true;
           }
@@ -421,11 +438,82 @@ export const useSoulStore = create<SoulStore>()(
           ui: { ...state.ui, isPreviewOpen: open },
         }));
       },
+
+      // 加载模板
+      loadTemplate: (template) => {
+        set(() => {
+          const newSoul = {
+            name: template.name,
+            description: template.description,
+            version: '1.5.0',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            ...template.soul,
+          };
+
+          // 验证 Soul 完整性
+          const validation = validateSoul(newSoul);
+          if (!validation.isValid) {
+            console.warn('Soul 验证失败:', validation.errors);
+          }
+
+          return { soul: newSoul };
+        });
+        get().saveToStorage();
+      },
+
+      // LLM API 配置管理
+      setLLMConfig: (config: LLMConfig) => {
+        // LLM 配置存储在单独的 localStorage key 中
+        try {
+          localStorage.setItem(LLM_CONFIG_STORAGE_KEY, JSON.stringify(config));
+          set({ llm: { config } });
+        } catch (error) {
+          console.error('存储 LLM 配置失败:', error);
+        }
+      },
+
+      getLLMConfig: () => {
+        // 优先从 state 获取，如果没有则从 localStorage 读取
+        const stateConfig = get().llm?.config;
+        if (stateConfig) return stateConfig;
+
+        try {
+          const storedConfig = localStorage.getItem(LLM_CONFIG_STORAGE_KEY);
+          if (storedConfig) {
+            const config = JSON.parse(storedConfig) as LLMConfig;
+            set({ llm: { config } });
+            return config;
+          }
+        } catch (error) {
+          console.error('读取 LLM 配置失败:', error);
+        }
+        return undefined;
+      },
+
+      clearLLMConfig: () => {
+        try {
+          localStorage.removeItem(LLM_CONFIG_STORAGE_KEY);
+          set({ llm: { config: undefined } });
+        } catch (error) {
+          console.error('清除 LLM 配置失败:', error);
+        }
+      },
+
+      validateLLMConfig: async () => {
+        const config = get().getLLMConfig();
+        if (!config) return { valid: false, error: '未配置 LLM' };
+        return validateLLMAPI(config);
+      },
     }),
     {
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ soul: state.soul }),
+      partialize: (state) => ({
+        soul: state.soul,
+        language: state.language,
+        llm: state.llm,
+      }),
     }
   )
 );

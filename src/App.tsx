@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Menu, ActionIcon, Title } from '@mantine/core';
+import { Box, Grid, Paper, ThemeIcon, Text, Group, Stack, Menu, ActionIcon, Title, Button } from '@mantine/core';
 import {
   IconBrain,
   IconBook,
@@ -8,21 +8,52 @@ import {
   IconFileCode,
   IconMarkdown,
   IconRobot,
+  IconLanguage,
+  IconSettings,
+  IconSparkles,
 } from '@tabler/icons-react';
 import { useSoulStore } from './store/soulStore';
 import { ModuleLibrary } from './components/ModuleLibrary';
+import { TemplateGallery } from './components/TemplateGallery';
+import { AIGenerateModal } from './components/AIGenerateModal';
+import { SettingsModal } from './components/SettingsModal';
 import { BuilderZone } from './components/BuilderZone';
 import { PreviewPanel } from './components/PreviewPanel';
 import { ClaudeCodeExporter } from './exporters/ClaudeCodeExporter';
+import { useTranslation } from './i18n';
 
 function App() {
-  const { ui, setPreviewOpen, soul, exportToJson } = useSoulStore();
+  const { ui, setPreviewOpen, soul, exportToJson, language, setLanguage } = useSoulStore();
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = React.useState(false);
   const [expandedModule, setExpandedModule] = React.useState<string | null>('identity');
+  const [templateGalleryExpanded, setTemplateGalleryExpanded] = React.useState(true);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [aiGenerateOpen, setAIGenerateOpen] = React.useState(false);
 
   // 处理模块展开/折叠
   const handleModuleToggle = (moduleKey: string) => {
     setExpandedModule(prev => prev === moduleKey ? null : moduleKey);
+  };
+
+  // 语言切换
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'zh' ? 'en' : 'zh');
+  };
+
+  // 打开设置
+  const handleSettingsOpen = () => {
+    setSettingsOpen(true);
+  };
+
+  // 打开 AI 生成
+  const handleAIGenerateOpen = () => {
+    const config = useSoulStore.getState().getLLMConfig();
+    if (!config || !config.apiKey || !config.baseURL || !config.model) {
+      setSettingsOpen(true);
+    } else {
+      setAIGenerateOpen(true);
+    }
   };
 
   // 响应式检测
@@ -57,26 +88,26 @@ function App() {
       const soulData = JSON.parse(json);
       const md = `# ${soulData.name || 'Soul'}
 
-## 身份
-${soulData.identity || '未设置'}
+${language === 'zh' ? '## 身份' : '## Identity'}
+${soulData.identity || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 能力
-${soulData.abilities?.map((a: string) => `- ${a}`).join('\n') || '未设置'}
+${language === 'zh' ? '## 能力' : '## Abilities'}
+${soulData.abilities?.map((a: string) => `- ${a}`).join('\n') || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 风格
-${soulData.styles?.map((s: string) => `- ${s}`).join('\n') || '未设置'}
+${language === 'zh' ? '## 风格' : '## Styles'}
+${soulData.styles?.map((s: string) => `- ${s}`).join('\n') || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 流程
-${soulData.flows?.map((f: { id: string; order?: number }) => `- ${f.id}`).join('\n') || '未设置'}
+${language === 'zh' ? '## 流程' : '## Flows'}
+${soulData.flows?.map((f: { id: string; order?: number }) => `- ${f.id}`).join('\n') || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 知识
-${soulData.knowledge || '未设置'}
+${language === 'zh' ? '## 知识' : '## Knowledge'}
+${soulData.knowledge || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 约束
-${soulData.constraints?.map((c: string) => `- ${c}`).join('\n') || '未设置'}
+${language === 'zh' ? '## 约束' : '## Constraints'}
+${soulData.constraints?.map((c: string) => `- ${c}`).join('\n') || (language === 'zh' ? '未设置' : 'Not set')}
 
-## 工具
-${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
+${language === 'zh' ? '## 工具' : '## Tools'}
+${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || (language === 'zh' ? '未设置' : 'Not set')}
 `;
       const blob = new Blob([md], { type: 'text/markdown' });
       const url = URL.createObjectURL(blob);
@@ -94,7 +125,7 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
     try {
       if (!soul) return;
       const exporter = new ClaudeCodeExporter();
-      const md = exporter.export(soul);
+      const md = exporter.export(soul, language);
       const blob = new Blob([md], { type: 'text/markdown' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -137,12 +168,12 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
 
   // 左侧模块列表配置
   const leftModules = [
-    { key: 'identity' as const, title: '身份', inputType: 'single' as const },
-    { key: 'ability' as const, title: '能力', inputType: 'multi' as const },
-    { key: 'style' as const, title: '风格', inputType: 'multi' as const },
-    { key: 'flow' as const, title: '流程', inputType: 'sort' as const },
-    { key: 'constraint' as const, title: '约束', inputType: 'multi' as const },
-    { key: 'tool' as const, title: '工具', inputType: 'multi' as const },
+    { key: 'identity' as const, title: t('layers.identity'), inputType: 'single' as const },
+    { key: 'ability' as const, title: t('layers.ability'), inputType: 'multi' as const },
+    { key: 'style' as const, title: t('layers.style'), inputType: 'multi' as const },
+    { key: 'flow' as const, title: t('layers.flow'), inputType: 'sort' as const },
+    { key: 'constraint' as const, title: t('layers.constraint'), inputType: 'multi' as const },
+    { key: 'tool' as const, title: t('layers.tool'), inputType: 'multi' as const },
   ];
 
   return (
@@ -156,36 +187,64 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
             </ThemeIcon>
             <div>
               <Title order={1} fw={600} size="xl">
-                Soul & Agent 构建器
+                {t('ui.title')}
               </Title>
               <Text size="sm" c="dimmed" mt={2}>
-                通过拖拽创建你的 AI 人格
+                {t('ui.subtitle')}
               </Text>
             </div>
           </Group>
           <Group gap="xs">
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              onClick={handleSettingsOpen}
+              title={t('settings.title')}
+              style={{ width: '44px', height: '44px' }}
+            >
+              <IconSettings size={18} />
+            </ActionIcon>
+            <Button
+              variant="gradient"
+              gradient={{ from: 'violet', to: 'purple' }}
+              size="md"
+              leftSection={<IconSparkles size={18} />}
+              onClick={handleAIGenerateOpen}
+            >
+              {language === 'zh' ? 'AI 生成' : 'AI Generate'}
+            </Button>
+            <ActionIcon
+              variant="subtle"
+              size="lg"
+              onClick={handleLanguageToggle}
+              title={language === 'zh' ? 'Switch to English' : '切换到中文'}
+              style={{ width: '44px', height: '44px' }}
+            >
+              <IconLanguage size={18} />
+              <span style={{ fontSize: '9px', marginLeft: '2px' }}>{language === 'zh' ? '中' : 'EN'}</span>
+            </ActionIcon>
             {hasContent && (
               <>
                 <Menu shadow="md" width={200}>
                   <Menu.Target>
-                    <ActionIcon variant="light" color="violet" size="xl" title="导出" style={{ width: '44px', height: '44px' }}>
+                    <ActionIcon variant="light" color="violet" size="xl" title={t('ui.export')} style={{ width: '44px', height: '44px' }}>
                       <IconDownload size={20} />
                     </ActionIcon>
                   </Menu.Target>
                   <Menu.Dropdown>
                     <Menu.Item leftSection={<IconFileCode size={18} />} onClick={handleExportJson}>
-                      导出 JSON
+                      {t('export.json')}
                     </Menu.Item>
                     <Menu.Item leftSection={<IconMarkdown size={18} />} onClick={handleExportMarkdown}>
-                      导出 Markdown
+                      {t('export.markdown')}
                     </Menu.Item>
                     <Menu.Divider />
                     <Menu.Item leftSection={<IconRobot size={18} />} onClick={handleExportClaudeCode}>
-                      导出 CLAUDE.md
+                      {t('export.claude')}
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
-                <ActionIcon variant="light" color="blue" size="xl" onClick={handleShare} title="分享" style={{ width: '44px', height: '44px' }}>
+                <ActionIcon variant="light" color="blue" size="xl" onClick={handleShare} title={t('ui.share')} style={{ width: '44px', height: '44px' }}>
                   <IconShare size={20} />
                 </ActionIcon>
               </>
@@ -209,7 +268,13 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
       <Grid gutter="md" style={{ padding: '1rem', height: 'calc(100vh - 80px)' }}>
         {/* 左侧：模块库 - 桌面端显示全部，移动端隐藏 */}
         <Grid.Col span={{ base: 12, md: 3 }}>
-          <Stack gap="md" style={{ height: 'calc(100vh - 120px)', overflow: 'auto' }}>
+          <Stack gap="md" style={{ maxHeight: 'calc(100vh - 120px)', overflow: 'auto' }}>
+            {/* 模板画廊 */}
+            <TemplateGallery
+              isExpanded={templateGalleryExpanded}
+              onToggle={() => setTemplateGalleryExpanded(prev => !prev)}
+            />
+            {/* 模块库 */}
             {leftModules.map((module) => (
               <ModuleLibrary
                 key={module.key}
@@ -236,6 +301,12 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
           <PreviewPanel />
         </Grid.Col>
       </Grid>
+
+      {/* 设置面板 */}
+      <SettingsModal opened={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+      {/* AI 生成对话框 */}
+      <AIGenerateModal opened={aiGenerateOpen} onClose={() => setAIGenerateOpen(false)} />
     </Box>
   );
 }
