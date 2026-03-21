@@ -104,7 +104,8 @@ Do not include any explanation or markdown formatting. Return pure JSON only.`;
  */
 export async function generateSoul(
   config: LLMConfig,
-  request: GenerateSoulRequest
+  request: GenerateSoulRequest,
+  signal?: AbortSignal
 ): Promise<GenerateSoulResponse> {
   const { apiKey, baseURL, model, useProxy, proxyUrl } = config;
 
@@ -178,6 +179,7 @@ export async function generateSoul(
           headers: customHeaders,
           requestBody,
         }),
+        signal,
       });
 
       if (!response.ok) {
@@ -251,6 +253,7 @@ export async function generateSoul(
             { role: 'user', content: userPrompt }
           ],
         }),
+        signal,
       });
     } else if (isAliyunDashScope) {
       // 阿里云 DashScope API 格式（特殊格式：input.messages）
@@ -272,6 +275,7 @@ export async function generateSoul(
             max_tokens: 2048,
           },
         }),
+        signal,
       });
     } else {
       // OpenAI 兼容 API 格式（包括阿里云百炼 coding.dashscope.aliyuncs.com）
@@ -289,6 +293,7 @@ export async function generateSoul(
           ],
           max_tokens: 2048,
         }),
+        signal,
       });
     }
 

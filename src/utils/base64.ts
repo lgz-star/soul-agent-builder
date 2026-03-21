@@ -2,6 +2,11 @@
  * Base64 编码工具
  */
 
+// 声明 Buffer 类型以支持 Node.js/Bun 环境
+declare const Buffer: {
+  from(str: string, encoding?: string): { toString(encoding: string): string };
+};
+
 export function toBase64(str: string): string {
   try {
     // Node.js/Bun 环境
