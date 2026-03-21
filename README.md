@@ -4,6 +4,12 @@ AI 人格创作工具 — 通过拖拽模块化组件，快速创建高质量 AI
 
 **在线演示：** https://lgz-star.github.io/soul-agent-builder/
 
+**其他语言：** [English](./README.en.md)
+
+![Soul Agent Builder 界面截图](./docs/screenshot.png)
+
+> 💡 上图：主界面展示 — 左侧为模板画廊和模块词库，中间为构建区域，右侧为实时预览和导出面板
+
 ---
 
 ## 功能亮点
