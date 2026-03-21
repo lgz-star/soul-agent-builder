@@ -5,18 +5,18 @@ All notable changes to this project will be documented in this file.
 ## [1.0.1.0] - 2026-03-22
 
 ### Added
-- AI 生成进度指示器，支持三步可视化（分析需求 → 生成配置 → 完成）
-- AI 生成取消功能，支持随时终止正在进行的生成请求
-- LLM 服务后端代理支持，解决浏览器 CORS 跨域限制
+- **AI 生成进度指示器** — 三步可视化（分析需求 → 生成配置 → 完成），实时掌握生成状态
+- **AI 生成取消功能** — 随时终止正在进行的请求，不再需要等待完成
+- **LLM 服务后端代理** — 解决浏览器 CORS 限制，支持阿里云、Claude、OpenAI 等多种服务
 
 ### Changed
-- AIGenerateModal 重构为进度驱动 + 错误处理优化
-- llmService 支持 Anthropic、阿里云 DashScope、OpenAI 多种格式
-- Vite 配置优化，添加 CORS 头支持局域网访问
+- AIGenerateModal 交互优化 — 进度驱动设计 + 更清晰的错误提示
+- llmService 兼容性增强 — 自动识别 Anthropic、阿里云 DashScope、OpenAI API 格式
+- Vite 配置优化 — 添加 CORS 头，支持局域网访问开发服务器
 
 ### Fixed
-- 修复 Base64 工具在 Bun 测试环境下返回空字符串的问题
-- 修复知识层 HTML 转义 XSS 安全问题
+- Base64 工具兼容性 — 修复在 Bun/Node.js 测试环境下返回空字符串的问题
+- **XSS 安全防护** — 知识层输入添加 HTML 转义，防止脚本注入
 
 ## [1.0.0.0] - 2026-03-21
 
