@@ -3,3 +3,4 @@
  */
 export { MarkdownExporter } from './MarkdownExporter';
 export { JsonExporter } from './JsonExporter';
+export { ClaudeCodeExporter } from './ClaudeCodeExporter';

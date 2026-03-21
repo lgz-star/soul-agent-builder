@@ -7,11 +7,13 @@ import {
   IconShare,
   IconFileCode,
   IconMarkdown,
+  IconRobot,
 } from '@tabler/icons-react';
 import { useSoulStore } from './store/soulStore';
 import { ModuleLibrary } from './components/ModuleLibrary';
 import { BuilderZone } from './components/BuilderZone';
 import { PreviewPanel } from './components/PreviewPanel';
+import { ClaudeCodeExporter } from './exporters/ClaudeCodeExporter';
 
 function App() {
   const { ui, setPreviewOpen, soul, exportToJson } = useSoulStore();
@@ -88,6 +90,23 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
     }
   };
 
+  const handleExportClaudeCode = () => {
+    try {
+      if (!soul) return;
+      const exporter = new ClaudeCodeExporter();
+      const md = exporter.export(soul);
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CLAUDE.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('导出 CLAUDE.md 失败:', error);
+    }
+  };
+
   const handleShare = () => {
     try {
       const result = useSoulStore.getState().generateShareLink();
@@ -159,6 +178,10 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
                     </Menu.Item>
                     <Menu.Item leftSection={<IconMarkdown size={18} />} onClick={handleExportMarkdown}>
                       导出 Markdown
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item leftSection={<IconRobot size={18} />} onClick={handleExportClaudeCode}>
+                      导出 CLAUDE.md
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
