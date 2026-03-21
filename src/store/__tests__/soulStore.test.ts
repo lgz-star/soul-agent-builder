@@ -16,18 +16,6 @@ const mockLocalStorage = {
   }),
 };
 
-vi.mock('zustand/middleware', async () => {
-  const actual = await vi.importActual('zustand/middleware');
-  return {
-    ...(actual as object),
-    createJSONStorage: () => ({
-      getItem: mockLocalStorage.getItem,
-      setItem: mockLocalStorage.setItem,
-      removeItem: mockLocalStorage.removeItem,
-    }),
-  };
-});
-
 // 重新导入以使用 mock
 const { useSoulStore } = await import('../soulStore');
 
