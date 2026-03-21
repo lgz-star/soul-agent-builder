@@ -24,7 +24,7 @@ export const useSoulStore = create<SoulStore>()(
     (set, get) => ({
       // 初始状态
       soul: null,
-      language: 'zh',
+      language: 'en',
       libraries: {
         identities: identityLibrary,
         abilities: abilityLibrary,

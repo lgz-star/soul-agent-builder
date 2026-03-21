@@ -1,53 +1,61 @@
-# Soul & Agent 构建器
+# Soul & Agent Builder
 
-AI 人格创作工具 — 通过拖拽模块化组件，快速创建高质量 AI Agent/Soul
+AI Personality Creation Tool — Build high-quality AI Agents/Souls through drag-and-drop modular components
 
-**在线演示：** https://lgz-star.github.io/soul-agent-builder/
+**Live Demo:** https://lgz-star.github.io/soul-agent-builder/
 
-**其他语言：** [English](./README.en.md)
+**Other Languages:** [中文](./README.zh.md)
 
-![Soul Agent Builder 界面截图](./docs/screenshot.png)
+![Soul Agent Builder Screenshot](./docs/screenshot.png)
 
-> 💡 上图：主界面展示 — 左侧为模板画廊和模块词库，中间为构建区域，右侧为实时预览和导出面板
-
----
-
-## 功能亮点
-
-- **7 层通用结构** — 身份/能力/风格/流程/约束/知识/工具，覆盖所有 Soul 要素
-- **拖拽式组装** — 像搭积木一样创建 Soul
-- **一键分享** — 生成专属链接，瞬间分享你的创作成果
-- **多格式导出** — Markdown + JSON（支持 OpenClaw + Claude Code）
-- **AI 一键生成** — 输入需求描述，AI 自动帮你创建 Soul（进度可视化 + 随时取消）
+> 💡 Above: Main interface — Left panel shows template gallery and module library, center is the builder zone, right panel displays live preview and export options
 
 ---
 
-## 快速开始
+## AI-Generated Effect Demo
 
-### 开发
+![AI-Generated Effect Comparison](./docs/ai-generated.png)
+
+> 💡 Above: AI generation comparison — Left shows the original Soul, right shows the AI-optimized version with enhanced structure and clarity
+
+---
+
+## Features
+
+- **7-Layer Universal Structure** — Identity/Abilities/Style/Flow/Constraints/Knowledge/Tools, covering all Soul elements
+- **Drag-and-Drop Assembly** — Build Souls like stacking blocks
+- **One-Click Sharing** — Generate unique links to share your creations instantly
+- **Multi-Format Export** — Markdown + JSON (OpenClaw + Claude Code supported)
+- **AI One-Click Generation** — Describe your needs, AI builds the Soul for you (with progress visualization + cancel anytime)
+
+---
+
+## Quick Start
+
+### Development
 
 ```bash
-# 克隆项目
+# Clone the repository
 git clone https://github.com/YOUR_USERNAME/soul-agent-builder.git
 cd soul-agent-builder
 
-# 安装依赖
+# Install dependencies
 bun install
 
-# 启动开发服务器
+# Start development server
 bun run dev
 ```
 
-### 构建
+### Build
 
 ```bash
 bun run build
 
-# 预览构建结果
+# Preview build output
 bun run preview
 ```
 
-### 部署到 GitHub Pages
+### Deploy to GitHub Pages
 
 ```bash
 bun run deploy
@@ -55,106 +63,106 @@ bun run deploy
 
 ---
 
-## AI 功能配置（需要后端代理）
+## AI Feature Configuration (Backend Proxy Required)
 
-### 为什么需要后端代理？
+### Why a Backend Proxy?
 
-由于浏览器 **CORS（跨域资源共享）** 限制，直接从浏览器调用第三方 LLM API（如阿里云、Claude、OpenAI）会被阻止。
+Due to browser **CORS (Cross-Origin Resource Sharing)** restrictions, calling third-party LLM APIs (such as Aliyun, Claude, OpenAI) directly from the browser is blocked.
 
-**解决方案：** 运行一个轻量后端代理服务，转发所有 LLM API 请求。
+**Solution:** Run a lightweight backend proxy service to forward all LLM API requests.
 
-### 启动后端代理
+### Start the Backend Proxy
 
 ```bash
-# 启动后端代理服务
+# Start the backend proxy service
 bun run server
 
-# 或同时启动前端和后端
+# Or start both frontend and backend simultaneously
 bun run dev:all
 ```
 
-后端服务会运行在 `http://localhost:3001`，提供以下端点：
-- `GET /health` - 健康检查
-- `POST /api/llm/proxy` - LLM API 代理
-- `POST /api/llm/validate` - API 验证
+The backend service runs on `http://localhost:3001` with the following endpoints:
+- `GET /health` - Health check
+- `POST /api/llm/proxy` - LLM API proxy
+- `POST /api/llm/validate` - API validation
 
-### 配置 AI 功能
+### Configure AI Features
 
-1. 打开设置（右上角齿轮图标）
-2. 选择预设服务（如"阿里云百炼 (Coding)"）
-3. 输入 API Key
-4. **勾选"使用后端代理"**
-5. 点击"验证 API Key"测试连接
+1. Open Settings (gear icon in top-right corner)
+2. Select a preset service (e.g., "Aliyun Bailian (Coding)")
+3. Enter your API Key
+4. **Check "Use Backend Proxy"**
+5. Click "Validate API Key" to test the connection
 
-### 支持的 LLM 服务
+### Supported LLM Services
 
-| 预设 | Base URL | 推荐模型 |
-|------|----------|---------|
-| 阿里云百炼 (Coding) | `https://coding.dashscope.aliyuncs.com/v1/chat/completions` | `qwen3.5-plus` |
-| 阿里云 DashScope | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `qwen-plus` |
+| Preset | Base URL | Recommended Model |
+|--------|----------|-------------------|
+| Aliyun Bailian (Coding) | `https://coding.dashscope.aliyuncs.com/v1/chat/completions` | `qwen3.5-plus` |
+| Aliyun DashScope | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `qwen-plus` |
 | Claude | `https://api.anthropic.com/v1/messages` | `claude-sonnet-4-6` |
 | OpenAI | `https://api.openai.com/v1/chat/completions` | `gpt-4o` |
-| Ollama (本地) | `http://localhost:11434/api/chat` | `llama3` |
+| Ollama (Local) | `http://localhost:11434/api/chat` | `llama3` |
 
-### 没有后端代理的情况
+### Without Backend Proxy
 
-如果不想运行后端服务，可以选择：
-- **浏览器插件**：安装 "Allow CORS" 等插件临时禁用 CORS（仅限开发）
-- **本地部署**：使用 Ollama 等本地 LLM 服务
-
----
-
-## 技术栈
-
-| 层级 | 选择 |
-|------|------|
-| 框架 | React 18+ |
-| UI 库 | Mantine |
-| 拖拽库 | @dnd-kit |
-| 状态管理 | Zustand |
-| 构建工具 | Vite |
-| 测试框架 | Vitest + React Testing Library |
-| 后端代理 | Hono |
-| 部署 | GitHub Pages |
+If you prefer not to run a backend service:
+- **Browser Extension:** Install "Allow CORS" or similar extensions to temporarily disable CORS (development only)
+- **Local Deployment:** Use local LLM services like Ollama
 
 ---
 
-## 项目结构
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | React 18+ |
+| UI Library | Mantine |
+| Drag-and-Drop | @dnd-kit |
+| State Management | Zustand |
+| Build Tool | Vite |
+| Testing | Vitest + React Testing Library |
+| Backend Proxy | Hono |
+| Deployment | GitHub Pages |
+
+---
+
+## Project Structure
 
 ```
 soul-agent-builder/
 ├── src/
 │   ├── components/
-│   │   ├── ModuleLibrary.tsx    # 左侧模块库
-│   │   ├── BuilderZone.tsx      # 中间构建区
-│   │   ├── PreviewPanel.tsx     # 右侧预览
-│   │   ├── SettingsModal.tsx    # API 设置面板
-│   │   ├── AIGenerateModal.tsx  # AI 生成对话框
-│   │   └── SoulModule.tsx       # 单个模块组件
+│   │   ├── ModuleLibrary.tsx    # Left module library
+│   │   ├── BuilderZone.tsx      # Center builder zone
+│   │   ├── PreviewPanel.tsx     # Right preview panel
+│   │   ├── SettingsModal.tsx    # API settings modal
+│   │   ├── AIGenerateModal.tsx  # AI generation dialog
+│   │   └── SoulModule.tsx       # Single module component
 │   ├── store/
 │   │   ├── soulStore.ts         # Zustand store
-│   │   └── soulStore.types.ts   # 类型定义
+│   │   └── soulStore.types.ts   # Type definitions
 │   ├── services/
-│   │   └── llmService.ts        # LLM API 服务
+│   │   └── llmService.ts        # LLM API service
 │   ├── exporters/
 │   │   ├── MarkdownExporter.ts
 │   │   ├── JsonExporter.ts
 │   │   └── index.ts
 │   ├── utils/
-│   │   ├── base64.ts            # base64 工具
-│   │   ├── xss.ts               # XSS 防护
-│   │   └── storage.ts           # localStorage 封装
+│   │   ├── base64.ts            # Base64 utility
+│   │   ├── xss.ts               # XSS protection
+│   │   └── storage.ts           # localStorage wrapper
 │   ├── data/
-│   │   ├── identityLibrary.ts   # 身份词库
-│   │   ├── abilityLibrary.ts    # 能力词库
-│   │   ├── styleLibrary.ts      # 风格词库
-│   │   ├── flowLibrary.ts       # 流程词库
-│   │   ├── constraintLibrary.ts # 约束词库
-│   │   └── toolLibrary.ts       # 工具词库
+│   │   ├── identityLibrary.ts   # Identity library
+│   │   ├── abilityLibrary.ts    # Ability library
+│   │   ├── styleLibrary.ts      # Style library
+│   │   ├── flowLibrary.ts       # Flow library
+│   │   ├── constraintLibrary.ts # Constraint library
+│   │   └── toolLibrary.ts       # Tool library
 │   ├── App.tsx
 │   └── main.tsx
 ├── server/
-│   └── index.ts                 # Hono 后端代理
+│   └── index.ts                 # Hono backend proxy
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -164,50 +172,50 @@ soul-agent-builder/
 
 ---
 
-## 版本路线图
+## Version Roadmap
 
-### v1.0 MVP（当前版本）
-- [x] 拖拽组装
-- [x] 7 层结构
-- [x] Markdown + JSON 导出
-- [x] localStorage 自动保存
-- [x] 分享链接（base64）
-- [x] 预设词库
-- [x] 折叠式模块库
-- [x] 流程拖拽排序
-- [x] 知识层在线编辑
+### v1.0 MVP (Current)
+- [x] Drag-and-drop assembly
+- [x] 7-layer structure
+- [x] Markdown + JSON export
+- [x] localStorage auto-save
+- [x] Share link (base64)
+- [x] Preset libraries
+- [x] Collapsible module library
+- [x] Flow drag-and-drop sorting
+- [x] Knowledge layer online editing
 
 ### v1.0.1.0
-- [x] AI 生成进度指示器（三步可视化）
-- [x] AI 生成取消功能
-- [x] LLM 服务后端代理（解决 CORS）
+- [x] AI generation progress indicator (3-step visualization)
+- [x] AI generation cancel function
+- [x] LLM service backend proxy (CORS solution)
 
-### v1.1 (已合并到 v1.5)
-- [x] OpenClaw 导出 → 已合并到 v1.5
-- [x] Claude Code 导出 → 已合并到 v1.5
+### v1.1 (Merged into v1.5)
+- [x] OpenClaw export → Merged into v1.5
+- [x] Claude Code export → Merged into v1.5
 
 ### v1.5
-- [x] AI 一键生成 Soul
-- [x] 内置测试对话
-- [ ] GitHub 抓取自动解析
-- [x] 模板画廊
+- [x] AI One-Click Soul Generation
+- [x] Built-in test conversation
+- [ ] GitHub repository auto-parsing
+- [x] Template gallery
 
 ### v2.0
-- [ ] 用户系统 + 云存储
-- [ ] Soul 优化助手
-- [ ] Soul 市场（雏形）
+- [ ] User system + cloud storage
+- [ ] Soul optimization assistant
+- [ ] Soul marketplace (prototype)
 
 ---
 
-## 开发待办
+## Development TODOs
 
-详见 [TODOS.md](./TODOS.md)
+See [TODOS.md](./TODOS.md)
 
 ---
 
-## 快速体验
+## Try It Now
 
-访问 [GitHub Pages 在线演示](https://lgz-star.github.io/soul-agent-builder/) 立即体验
+Visit [GitHub Pages Live Demo](https://lgz-star.github.io/soul-agent-builder/) to experience it immediately
 
 ---
 
