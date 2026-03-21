@@ -123,6 +123,18 @@
   - **Why:** 浏览器 CORS 限制阻止直接调用 LLM API
   - **Status:** COMPLETED - Hono 后端代理已实现，运行在 http://localhost:3001
   - **新增命令:** `bun run server` (仅后端) / `bun run dev:all` (前后端同时)
+- [x] **P1: 添加进度指示器** — 三步可视化（分析需求 → 生成配置 → 完成）
+  - **Why:** 用户需要知道 AI 生成的进度状态
+  - **Status:** COMPLETED - AIGenerateModal 添加 Stepper 组件和进度条
+- [x] **P1: 添加取消功能** — 支持随时终止正在进行的生成请求
+  - **Why:** 用户可能需要取消长时间运行的请求
+  - **Status:** COMPLETED - AbortController 实现，取消按钮
+- [x] **P0: 修复 Base64 工具兼容性** — 支持 Node.js/Bun 测试环境
+  - **Why:** 测试失败，Base64 在 Bun 环境返回空字符串
+  - **Status:** COMPLETED - 添加 Buffer API 支持
+- [x] **P0: 修复知识层 XSS 问题** — HTML 转义安全
+  - **Why:** 安全漏洞，用户输入未转义
+  - **Status:** COMPLETED - setKnowledge 添加 escapeHtml 调用
 
 ### Remaining
 
@@ -138,4 +150,4 @@
 ---
 
 **生成时间：** 2026-03-20
-**最后更新：** 2026-03-21 (添加后端代理服务，解决 CORS 问题)
+**最后更新：** 2026-03-22 (v1.0.1.0 - AI 生成进度指示器、取消功能、Base64 修复、XSS 修复)
