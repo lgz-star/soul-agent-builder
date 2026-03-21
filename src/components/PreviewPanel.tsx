@@ -13,6 +13,7 @@ import {
   Textarea,
   ScrollArea,
   Badge,
+  Skeleton,
 } from '@mantine/core';
 import { IconCopy } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
@@ -22,6 +23,13 @@ export function PreviewPanel(): React.ReactElement {
   const { soul, setSoulName, setSoulDescription } = useSoulStore();
   const [isShareModalOpen, setShareModalOpen] = React.useState(false);
   const [shareUrl, setShareUrl] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // 模拟加载状态
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 监听打开分享弹窗的事件
   React.useEffect(() => {
@@ -68,24 +76,33 @@ export function PreviewPanel(): React.ReactElement {
     <>
       <Card withBorder shadow="sm" radius="md" style={{ height: '100%', overflow: 'auto' }}>
         <Group justify="space-between" mb="lg">
-          <Title order={5}>预览</Title>
+          <Title order={3}>预览</Title>
         </Group>
 
         {/* 元数据编辑 */}
         <Stack gap="md" mb="lg">
-          <TextInput
-            label="名称"
-            value={soul.name}
-            onChange={(e) => setSoulName(e.target.value)}
-            placeholder="输入 Soul 名称"
-          />
-          <Textarea
-            label="描述"
-            value={soul.description || ''}
-            onChange={(e) => setSoulDescription(e.target.value)}
-            placeholder="输入 Soul 描述"
-            minRows={2}
-          />
+          {isLoading ? (
+            <>
+              <Skeleton height={36} radius="sm" />
+              <Skeleton height={70} radius="sm" />
+            </>
+          ) : (
+            <>
+              <TextInput
+                label="名称"
+                value={soul.name}
+                onChange={(e) => setSoulName(e.target.value)}
+                placeholder="输入 Soul 名称"
+              />
+              <Textarea
+                label="描述"
+                value={soul.description || ''}
+                onChange={(e) => setSoulDescription(e.target.value)}
+                placeholder="输入 Soul 描述"
+                minRows={2}
+              />
+            </>
+          )}
         </Stack>
 
         <Divider my="md" />

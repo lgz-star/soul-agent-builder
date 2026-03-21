@@ -168,8 +168,8 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
               <>
                 <Menu shadow="md" width={200}>
                   <Menu.Target>
-                    <ActionIcon variant="light" color="violet" size="lg" title="导出">
-                      <IconDownload size={18} />
+                    <ActionIcon variant="light" color="violet" size="xl" title="导出" style={{ width: '44px', height: '44px' }}>
+                      <IconDownload size={20} />
                     </ActionIcon>
                   </Menu.Target>
                   <Menu.Dropdown>
@@ -185,8 +185,8 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
-                <ActionIcon variant="light" color="blue" size="lg" onClick={handleShare} title="分享">
-                  <IconShare size={18} />
+                <ActionIcon variant="light" color="blue" size="xl" onClick={handleShare} title="分享" style={{ width: '44px', height: '44px' }}>
+                  <IconShare size={20} />
                 </ActionIcon>
               </>
             )}
@@ -195,8 +195,10 @@ ${soulData.tools?.map((t: string) => `- ${t}`).join('\n') || '未设置'}
                 color={ui.isPreviewOpen ? 'violet' : 'gray'}
                 variant={ui.isPreviewOpen ? 'filled' : 'light'}
                 onClick={() => setPreviewOpen(!ui.isPreviewOpen)}
+                size="xl"
+                style={{ width: '44px', height: '44px' }}
               >
-                <IconBook size={18} />
+                <IconBook size={20} />
               </ThemeIcon>
             )}
           </Group>
