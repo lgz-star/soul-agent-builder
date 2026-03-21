@@ -12,9 +12,10 @@ import {
   Collapse,
   ActionIcon,
 } from '@mantine/core';
-import { IconPlus, IconCheck, IconChevronDown } from '@tabler/icons-react';
+import { IconPlus, IconCheck, IconChevronDown, IconLanguage } from '@tabler/icons-react';
 import { useSoulStore } from '../store/soulStore';
 import type { LibraryItem, FlowStep, Soul } from '../store/soulStore.types';
+import type { Language } from '../i18n';
 
 type LayerType = 'identity' | 'ability' | 'style' | 'flow' | 'constraint' | 'tool';
 
@@ -55,6 +56,7 @@ interface LibraryItemProps {
   item: LibraryItem;
   isSelected: boolean;
   inputType: 'single' | 'multi' | 'sort';
+  language: Language;
   onSelect: (id: string) => void;
 }
 
@@ -62,17 +64,21 @@ const LibraryItemCard = React.memo(function LibraryItemCard({
   item,
   isSelected,
   inputType,
+  language,
   onSelect,
 }: LibraryItemProps) {
   const handleClick = useCallback(() => {
     onSelect(item.id);
   }, [item.id, onSelect]);
 
+  // 获取本地化名称
+  const name = typeof item.name === 'object' ? item.name[language] : item.name;
+
   return (
     <Card
       key={item.id}
-      padding="sm"
-      mb="xs"
+      padding="6"
+      mb={3}
       radius="sm"
       withBorder
       onClick={handleClick}
@@ -85,40 +91,38 @@ const LibraryItemCard = React.memo(function LibraryItemCard({
           ? 'var(--mantine-color-violet)'
           : 'var(--mantine-color-gray-3)',
         transition: 'all 0.2s ease',
-        transform: 'translateY(0)',
       }}
       component="div"
     >
       <Group justify="space-between" wrap="nowrap">
-        <Box style={{ flex: 1 }}>
-          <Text fw={isSelected ? 600 : 500} size="sm" lh={1.3}>
-            {item.name}
+        <Group gap="xs" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+          <ThemeIcon
+            variant={isSelected ? 'filled' : 'light'}
+            color={isSelected ? 'violet' : 'gray'}
+            size="xs"
+            radius="sm"
+          >
+            {item.category ? <span style={{ fontSize: '10px', fontWeight: 600 }}>{item.category.charAt(0).toUpperCase()}</span> : <IconCheck size={12} />}
+          </ThemeIcon>
+          <Text fw={isSelected ? 600 : 500} size="xs" lh={1.3} style={{ flex: 1, minWidth: 0 }} title={name}>
+            {name}
           </Text>
-          {item.description && (
-            <Text size="xs" c="dimmed" mt={4} lh={1.4}>
-              {item.description}
-            </Text>
-          )}
-          {item.category && (
-            <Badge variant="outline" size="xs" mt={6} color="gray">
-              {item.category}
-            </Badge>
-          )}
-        </Box>
+        </Group>
         {inputType === 'single' ? (
           <ThemeIcon
             variant={isSelected ? 'filled' : 'outline'}
             color={isSelected ? 'violet' : 'gray'}
-            size="md"
+            size="xs"
             radius="xl"
           >
-            {isSelected ? <IconCheck size={16} /> : <IconPlus size={16} />}
+            {isSelected ? <IconCheck size={12} /> : <IconPlus size={12} />}
           </ThemeIcon>
         ) : (
           <Checkbox
             checked={isSelected}
             onChange={() => {}}
-            aria-label={`选择 ${item.name}`}
+            aria-label={`${language === 'zh' ? '选择' : 'Select'} ${name}`}
+            size="xs"
           />
         )}
       </Group>
@@ -134,7 +138,7 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
   isExpanded,
   onToggle,
 }: ModuleLibraryProps) {
-  const { libraries, soul } = useSoulStore();
+  const { libraries, soul, language, setLanguage } = useSoulStore();
 
   const items = useMemo(() => {
     const { libraryKey } = layerConfig[layerType];
@@ -144,6 +148,11 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
   const selectedIds = useMemo(() => {
     return getSelectedIds(soul, layerType);
   }, [soul, layerType]);
+
+  // 语言切换处理
+  const handleLanguageToggle = useCallback(() => {
+    setLanguage(language === 'zh' ? 'en' : 'zh');
+  }, [language, setLanguage]);
 
   // 使用 useCallback 缓存选择处理函数
   const handleSelect = useCallback(
@@ -197,14 +206,14 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
     >
       <Group
         justify="space-between"
-        mb="xs"
+        mb="sm"
         onClick={onToggle}
         style={{
           cursor: 'pointer',
           transition: 'background-color 0.2s ease',
           borderRadius: 'var(--mantine-radius-md)',
-          padding: '4px 8px',
-          margin: '-4px -8px',
+          padding: '6px 10px',
+          margin: '-6px -10px',
         }}
       >
         <Group gap="xs" wrap="nowrap">
@@ -217,23 +226,37 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
               transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            <IconChevronDown size={18} />
+            <IconChevronDown size={16} />
           </ActionIcon>
-          <Title order={3} size="h5">{title}</Title>
+          <Title order={3} size="h6">{title}</Title>
         </Group>
-        {inputType === 'multi' && (
-          <Badge
-            variant="light"
+        <Group gap="xs" wrap="nowrap">
+          <ActionIcon
+            variant="subtle"
             size="sm"
-            style={{ transition: 'transform 0.2s ease' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLanguageToggle();
+            }}
+            title={language === 'zh' ? 'Switch to English' : '切换到中文'}
           >
-            已选 {selectedCount}
-          </Badge>
-        )}
+            <IconLanguage size={14} />
+            <span style={{ fontSize: '9px', marginLeft: '2px' }}>{language === 'zh' ? '中' : 'EN'}</span>
+          </ActionIcon>
+          {inputType === 'multi' && (
+            <Badge
+              variant="light"
+              size="xs"
+              style={{ transition: 'transform 0.2s ease' }}
+            >
+              {language === 'zh' ? '已选' : 'Selected'} {selectedCount}
+            </Badge>
+          )}
+        </Group>
       </Group>
 
       <Collapse in={isExpanded}>
-        <ScrollArea style={{ maxHeight: 'calc(100vh - 250px)' }} offsetScrollbars type="hover">
+        <ScrollArea style={{ maxHeight: 'min(400px, calc(100vh - 350px))' }} offsetScrollbars type="hover">
           <Box pb="xs">
             {visibleItems.map((item: LibraryItem) => (
               <LibraryItemCard
@@ -241,6 +264,7 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
                 item={item}
                 isSelected={selectedIds.includes(item.id)}
                 inputType={inputType}
+                language={language}
                 onSelect={handleSelect}
               />
             ))}
@@ -258,7 +282,7 @@ export const ModuleLibrary = React.memo(function ModuleLibrary({
                 onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--mantine-color-violet-7)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--mantine-color-dimmed)'; }}
               >
-                展开 {items.length - 3} 更多...
+                {language === 'zh' ? '展开' : 'Expand'} {items.length - 3} {language === 'zh' ? '更多...' : 'more...'}
               </Text>
             )}
           </Box>
